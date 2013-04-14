@@ -1,6 +1,6 @@
 # PluginJob
 
-TODO: Write a gem description
+Framework for adding automation jobs as plugins to a host application.
 
 ## Installation
 
