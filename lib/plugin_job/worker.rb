@@ -1,11 +1,11 @@
 require "eventmachine"
 
-class Worker
-  
-  def initialize
-
+module PluginJob
+  class Worker
+    
+    def initialize
+      
+    end
+    
   end
-
-  
-
 end
