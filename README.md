@@ -16,9 +16,19 @@ Or install it yourself as:
 
     $ gem install plugin_job
 
-## Usage
+## Plugging jobs into an application
 
-TODO: Write usage instructions here
+The client is responsible for maintaining a list of plugins available to it.
+
+The host is responsible for maintaining a list of plugins it offers.
+
+The application running the dispatcher is responsible for loading the plugins.
+
+### Calling and loading plugins
+
+The application running the dispatcher should load classes that implement the public methods of PluginJob::Worker.
+
+The client requests a plugin to be run by sending the name of the worker class responsible for the job to the dispatcher.
 
 ## Contributing
 
