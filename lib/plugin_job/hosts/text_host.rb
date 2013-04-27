@@ -5,14 +5,14 @@ module PluginJob
     def initialize(command, plugins, connection)
       @connection = connection
       @command = command
-      @plugins = plugins # PluginJob.configuration.plugins
+      @plugins = plugins
     end
     
     def launch
       log "Command: #{@command}\n"
+      sleep 5
       begin
-        sleep 5
-        if @plugins.command_list.includes?(@command)
+        if @plugins.has_command?(@command)
           @plugins[@command].new(self).run
         end
         log "Completed"

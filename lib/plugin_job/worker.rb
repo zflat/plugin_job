@@ -3,8 +3,11 @@ require "eventmachine"
 module PluginJob
   class Worker
     
-    def initialize
-      
+    def valid?
+      true
+    end
+
+    def run
     end
     
   end

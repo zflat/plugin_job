@@ -17,6 +17,7 @@ module PluginJob
                                   "Port" => 3333
                                 )}
 
+    let(:command){"job"}
     before :each do
       # capture output to a temp file
       dispatcher.io.stdout = temp_out
@@ -26,13 +27,14 @@ module PluginJob
     
     it "responds with an echo" do
       expect(dispatcher).to be_alive
-      client.cmd({"String" => "job", "Match" => Regexp.new(">>")}){|c| puts c}
+      client.cmd({"String" => command, "Match" => Regexp.new(">>")}){|c| puts c}
 
       temp_out.rewind
       output = temp_out.read
       # read output from the temp file
+      puts output
       expect(output).to_not be_nil
-      expect(output =~ /Job/).to_not be_nil
+      expect(output =~ Regexp.new(command)).to_not be_nil
     end
 
     after :each do

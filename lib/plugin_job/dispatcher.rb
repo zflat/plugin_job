@@ -80,10 +80,11 @@ module PluginJob
   
   class Dispatcher
 
-    def initialize(host_type, plugins_collection, log=nil)
+    def initialize(host_type, plugins_collection, ifconfig={}, log=nil)
       @host_type = host_type
       @host_lock = Mutex.new
       @current_host = LaunchHost.new plugins_collection
+      @ifconfig = ifconfig
     end
     
     def start
@@ -93,8 +94,8 @@ module PluginJob
       Signal.trap("INT")  { EventMachine.stop }
       Signal.trap("TERM") { EventMachine.stop }
       
-      @signature = EM::start_server(PluginJob.configuration.host_ip, 
-                                    PluginJob.configuration.port, 
+      @signature = EM::start_server(@ifconfig['host_ip'] || PluginJob.configuration.host_ip, 
+                                    @ifconfig['port'] || PluginJob.configuration.port, 
                                     DispatchHandler, @host_lock, @host_type, @current_host)
         
       puts "Running Dispatcher on #{PluginJob.configuration.port}"

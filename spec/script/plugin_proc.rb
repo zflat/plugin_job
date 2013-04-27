@@ -8,7 +8,9 @@ require 'bundler/setup'
 require 'plugin_job'
 require "plugin_job/hosts/text_host"
 
-server = PluginJob::Dispatcher.new(PluginJob::TextHost, [])
+plugins = PluginJob::Collection.new {}
+host_type = PluginJob::TextHost
+server = PluginJob::Dispatcher.new(host_type, plugins)
 
 EM::run do
   server.start
