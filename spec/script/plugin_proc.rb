@@ -8,7 +8,7 @@ require 'bundler/setup'
 require 'plugin_job'
 require "plugin_job/hosts/text_host"
 
-plugins = PluginJob::Collection.new {}
+plugins = PluginJob::Collection.new({})
 host_type = PluginJob::TextHost
 server = PluginJob::Dispatcher.new(host_type, plugins)
 
