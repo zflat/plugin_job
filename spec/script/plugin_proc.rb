@@ -8,11 +8,21 @@ require 'bundler/setup'
 require 'plugin_job'
 require "plugin_job/hosts/text_host"
 
+require "log4r"
+include Log4r
+log = Logger.new 'log'
+log.outputters = Outputter.stdout
+
 plugins = PluginJob::Collection.new({})
 host_type = PluginJob::TextHost
-server = PluginJob::Dispatcher.new(host_type, plugins)
+server_config = {"host_ip" => "localhost", "port" => 3333}
+server = PluginJob::Dispatcher.new(host_type, 
+                                   plugins, 
+                                   server_config, 
+                                   log)
 
 EM::run do
   server.start
 end
+
 

@@ -1,7 +1,19 @@
 require "thread"
 require "eventmachine"
+require "log4r"
 
 module PluginJob
+
+  class EchoOutputter < Log4r::Outputter
+    def initialize(name, options={})
+      @connection = options[:connection]
+      super(name, options)
+    end
+    
+    def write(data)
+      @connection.send_data "#{data}\n"
+    end
+  end
 
   class DispatchHandler < EventMachine::Connection
 
@@ -52,8 +64,10 @@ module PluginJob
     end
 
     def dispatch_job(arg)
-      if (h = @host_scope.new(arg, @dispatcher_launch.plugins, self))
+      if (h = @host_scope.new(arg, @dispatcher_launch.plugins, 
+                              self, @dispatcher_launch.log))
         @dispatcher_launch.host = h
+        attach_echo(h.log)
         h.launch
       end
     end
@@ -61,7 +75,15 @@ module PluginJob
     def notify_block
       @dispatcher_launch.host.block command if @dispatcher_launch.host
     end
-    
+
+    private
+
+    def attach_echo(log)
+      if @echo.nil?
+        @echo = EchoOutputter.new('host', {:connection => self})
+        log.add(@echo)
+      end
+    end
   end # class DispatchHandler
 
   # Container class that is used to
@@ -72,8 +94,10 @@ module PluginJob
   class LaunchHost
     attr_accessor :host
     attr_reader :plugins
-    def initialize(plugins, host = nil)
+    attr_reader :log
+    def initialize(plugins, log, host = nil)
       @plugins = plugins
+      @log = log
       @host = host
     end
   end
@@ -83,7 +107,7 @@ module PluginJob
     def initialize(host_type, plugins_collection, ifconfig={}, log=nil)
       @host_type = host_type
       @host_lock = Mutex.new
-      @current_host = LaunchHost.new plugins_collection
+      @current_host = LaunchHost.new plugins_collection, log
       @ifconfig = ifconfig
     end
     

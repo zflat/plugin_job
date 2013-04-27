@@ -23,4 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency(%q<rspec>, [">= 1.3.0"])
   spec.add_development_dependency(%q<eventmachine>, [">= 1.0.3"])
   spec.add_development_dependency(%q<childprocess>, [">= 0.3.9"])
+  spec.add_development_dependency(%q<log4r>, ["~>1.1.10"])
 end

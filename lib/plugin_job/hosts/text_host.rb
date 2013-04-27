@@ -1,35 +1,38 @@
 
 module PluginJob
+
   class TextHost
-    
-    def initialize(command, plugins, connection)
+    attr_reader :log
+
+    def initialize(command, plugins, connection, log)
       @connection = connection
       @command = command
       @plugins = plugins
+      @log = log
     end
     
     def launch
-      log "Command: #{@command}\n"
+      log.info "Command: #{@command}\n"
       sleep 5
       begin
         if @plugins.has_command?(@command)
           @plugins[@command].new(self).run
         end
-        log "Completed"
+        log.info "Completed"
       rescue
-        log "An error occurred: #{$!}"
+        log.info "An error occurred: #{$!}"
       end
-      log ">> "
+      log.info ">> "
     end
     
     def block(command)
-      log "Request '#{command}' blocked by an existing job."
+      log.info "Request '#{command}' blocked by an existing job."
     end
 
-    def log(message)
-      @connection.send_data "#{message}\n"
-      puts message
-    end
+#    def log(message)
+#      @connection.send_data "#{message}\n"
+#      puts message
+#    end
     
   end
 end

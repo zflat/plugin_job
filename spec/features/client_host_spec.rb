@@ -27,7 +27,7 @@ module PluginJob
     
     it "responds with an echo" do
       expect(dispatcher).to be_alive
-      client.cmd({"String" => command, "Match" => Regexp.new(">>")})# {|c| puts c}
+      client.cmd({"String" => command, "Match" => Regexp.new(">>")}){|c| puts c}
 
       temp_out.rewind
       output = temp_out.read
