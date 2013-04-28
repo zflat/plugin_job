@@ -4,13 +4,13 @@ module PluginJob
 
   class TextHost
     
-    attr_reader :log
-
+    include LogBuilder
+    
     def initialize(command, plugins, connection, log)
       @connection = connection
       @command = command
       @plugins = plugins
-      init_log(log)
+      init_log(log, "host")
     end
     
     def launch
@@ -29,16 +29,6 @@ module PluginJob
     def block(command)
       log.warn I18n.translate('plugin_job.host.block', :command => @command)
     end
-
-    private
-
-    def init_log(parent_log)
-      if @log.nil?
-        @log = Logger.new("host")
-        # inherit the outputters from the dispatcher
-        @log.outputters = parent_log.outputters
-      end
-    end # init_log
 
   end # class TextHost
 end # module PluginJob
