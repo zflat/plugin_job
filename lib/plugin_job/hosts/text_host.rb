@@ -14,21 +14,20 @@ module PluginJob
     end
     
     def launch
-      log.info "Command '#{@command}'"
+      log.info I18n.translate('plugin_job.host.command', :command => @command)
       sleep 5
       begin
         if @plugins.has_command?(@command)
           @plugins[@command].new(self).run
         end
-        log.info "Completed"
+        log.info I18n.translate('plugin_job.host.completed')
       rescue
-        log.info "An error occurred: #{$!}"
+        log.error I18n.translate('plugin_job.host.completed', :message => $!)
       end
-      log.info ">> "
     end
     
     def block(command)
-      log.info "Request '#{command}' blocked by an existing job."
+      log.warn I18n.translate('plugin_job.host.block', :command => @command)
     end
 
     private

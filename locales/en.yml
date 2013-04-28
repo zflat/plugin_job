@@ -1,0 +1,11 @@
+en:
+  plugin_job:
+    dispatcher:
+      :connected: Connection established
+      :disconnected: Connection closed
+      :started: "Listening on %{port}"
+    host:
+      :command: "Command '%{command}'"
+      :completed: "Completed"
+      :error: "An error occurred: %{message}"
+      :block: "Request '%{command}' blocked by an existing job."

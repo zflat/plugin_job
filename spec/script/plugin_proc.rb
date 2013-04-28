@@ -15,7 +15,7 @@ end
 
 require "log4r"
 include Log4r
-log = Logger.new 'log'
+log = Logger.new 'dispatcher'
 log.outputters = Outputter.stdout
 
 plugins = PluginJob::Collection.new({})

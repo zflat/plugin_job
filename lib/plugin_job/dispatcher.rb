@@ -1,7 +1,6 @@
 require "thread"
 require "eventmachine"
 
-
 module PluginJob
 
   class DispatchHandler < EventMachine::Connection
@@ -16,7 +15,7 @@ module PluginJob
     end
     
     def post_init
-      puts "-- Dispatcher connection established"
+      @dispatcher_launch.log.info I18n.translate('plugin_job.dispatcher.connected')
     end
     
     def receive_data(requested_command)
@@ -30,7 +29,7 @@ module PluginJob
     end # receive_data
     
     def unbind
-      puts "-- Dispatcher connection closed"
+      @dispatcher_launch.log.info I18n.translate('plugin_job.dispatcher.disconnected')
     end
 
     private 
@@ -97,11 +96,12 @@ module PluginJob
       Signal.trap("INT")  { EventMachine.stop }
       Signal.trap("TERM") { EventMachine.stop }
       
-      @signature = EM::start_server(@ifconfig['host_ip'] || PluginJob.configuration.host_ip, 
-                                    @ifconfig['port'] || PluginJob.configuration.port, 
-                                    DispatchHandler, @host_lock, @host_type, @current_host)
-        
-      puts "Running Dispatcher on #{PluginJob.configuration.port}"
+      ip = @ifconfig['host_ip'] || PluginJob.configuration.host_ip
+      port = @ifconfig['port'] || PluginJob.configuration.port
+      @signature = EM::start_server(ip, port, DispatchHandler, 
+                                    @host_lock, @host_type, @current_host)
+      
+      @current_host.log.info I18n.translate('plugin_job.dispatcher.started', :port => port)
     end
 
     def stop
