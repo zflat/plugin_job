@@ -15,7 +15,6 @@ module PluginJob
     
     def launch
       log.info I18n.translate('plugin_job.host.command', :command => @command)
-      sleep 5
       begin
         if @plugins.has_command?(@command)
           @plugins[@command].new(self).run
