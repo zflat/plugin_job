@@ -27,7 +27,7 @@ module PluginJob
     end
     
     def block(command)
-      log.warn I18n.translate('plugin_job.host.block', :command => @command)
+      log.warn I18n.translate('plugin_job.host.block', :command => command)
     end
 
   end # class TextHost
