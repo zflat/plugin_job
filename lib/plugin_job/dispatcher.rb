@@ -90,14 +90,18 @@ module PluginJob
     end
     
     def start
-      return if PluginJob.configuration.nil?
-
       # hit Control + C to stop
       Signal.trap("INT")  { EventMachine.stop }
       Signal.trap("TERM") { EventMachine.stop }
       
-      ip = @ifconfig['host_ip'] || PluginJob.configuration.host_ip
-      port = @ifconfig['port'] || PluginJob.configuration.port
+      ip = @ifconfig['host_ip']
+      port = @ifconfig['port']
+
+      unless PluginJob.configuration.nil?
+        ip ||= PluginJob.configuration.host_ip
+        port ||= PluginJob.configuration.port
+      end
+
       @signature = EM::start_server(ip, port, DispatchHandler, 
                                     @host_lock, @host_type, @current_host)
       
