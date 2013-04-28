@@ -23,8 +23,9 @@ host_type = EchoHost #  PluginJob::TextHost
 server_config = {"host_ip" => "localhost", "port" => 3333}
 server = PluginJob::Dispatcher.new(host_type, 
                                    plugins, 
-                                   server_config, 
-                                   log)
+                                   log,
+                                   server_config)
+
 
 EM::run do
   server.start

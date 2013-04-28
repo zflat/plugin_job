@@ -82,7 +82,7 @@ module PluginJob
   
   class Dispatcher
 
-    def initialize(host_type, plugins_collection, ifconfig={}, log=nil)
+    def initialize(host_type, plugins_collection, log=nil, ifconfig={})
       @host_type = host_type
       @host_lock = Mutex.new
       @current_host = LaunchHost.new plugins_collection, log

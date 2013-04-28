@@ -1,6 +1,9 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'rspec'
 require 'plugin_job'
+require 'log4r'
+
+include Log4r
 
 # Requires supporting files with custom matchers and macros, etc,
 # in ./support/ and its subdirectories.
