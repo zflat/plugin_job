@@ -1,35 +1,24 @@
 require "thread"
 require "eventmachine"
-require "log4r"
+
 
 module PluginJob
 
-  class EchoOutputter < Log4r::Outputter
-    def initialize(name, options={})
-      @connection = options[:connection]
-      super(name, options)
-    end
-    
-    def write(data)
-      @connection.send_data "#{data}\n"
-    end
-  end
-
   class DispatchHandler < EventMachine::Connection
-
+    
     attr_reader :lock
     attr_reader :command
-
+    
     def initialize(lock_mutex, host_type, current_dispatcher_launch)
       @lock = lock_mutex
       @host_scope = host_type
       @dispatcher_launch = current_dispatcher_launch
     end
-
+    
     def post_init
       puts "-- Dispatcher connection established"
     end
-
+    
     def receive_data(requested_command)
       return if requested_command.nil?
       @command = requested_command.to_s.strip
@@ -67,22 +56,12 @@ module PluginJob
       if (h = @host_scope.new(arg, @dispatcher_launch.plugins, 
                               self, @dispatcher_launch.log))
         @dispatcher_launch.host = h
-        attach_echo(h.log)
         h.launch
       end
     end
 
     def notify_block
       @dispatcher_launch.host.block command if @dispatcher_launch.host
-    end
-
-    private
-
-    def attach_echo(log)
-      if @echo.nil?
-        @echo = EchoOutputter.new('host', {:connection => self})
-        log.add(@echo)
-      end
     end
   end # class DispatchHandler
 

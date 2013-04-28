@@ -1,18 +1,20 @@
+require "plugin_job/outputters/host_echo"
 
 module PluginJob
 
   class TextHost
+    
     attr_reader :log
 
     def initialize(command, plugins, connection, log)
       @connection = connection
       @command = command
       @plugins = plugins
-      @log = log
+      init_log(log)
     end
     
     def launch
-      log.info "Command: #{@command}\n"
+      log.info "Command '#{@command}'"
       sleep 5
       begin
         if @plugins.has_command?(@command)
@@ -29,10 +31,15 @@ module PluginJob
       log.info "Request '#{command}' blocked by an existing job."
     end
 
-#    def log(message)
-#      @connection.send_data "#{message}\n"
-#      puts message
-#    end
-    
-  end
-end
+    private
+
+    def init_log(parent_log)
+      if @log.nil?
+        @log = Logger.new("host")
+        # inherit the outputters from the dispatcher
+        @log.outputters = parent_log.outputters
+      end
+    end # init_log
+
+  end # class TextHost
+end # module PluginJob
