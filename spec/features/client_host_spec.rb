@@ -9,7 +9,7 @@ module PluginJob
 
   describe "client making calls to the dispatcher" do
     let(:dispatcher){ChildProcess.
-      build("ruby", File.join(File.dirname(__FILE__), '..','script','plugin_proc.rb'))}
+      build("ruby", File.join(File.dirname(__FILE__), '..','script','plugin_proc.rb'), 'stdout')}
     let(:temp_out){Tempfile.new("client_host_spec_0")}
     let(:client){Net::Telnet::new("Host" => "localhost",
                                   "Timeout" => 10,
