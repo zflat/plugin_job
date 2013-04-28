@@ -16,7 +16,9 @@ end
 require "log4r"
 include Log4r
 log = Logger.new 'dispatcher'
-log.outputters = Outputter.stdout
+if ARGV.include?('stdout')
+  log.outputters = Outputter.stdout
+end
 
 plugins = PluginJob::Collection.new({})
 host_type = EchoHost #  PluginJob::TextHost
@@ -30,5 +32,3 @@ server = PluginJob::Dispatcher.new(host_type,
 EM::run do
   server.start
 end
-
-
