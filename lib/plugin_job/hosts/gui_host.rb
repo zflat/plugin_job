@@ -13,11 +13,10 @@ module PluginJob
     end
 
     def launch
-#      app = Qt::Application.new(ARGV)
+      # app = Qt::Application.new(ARGV)
       window = Qt::Widget.new()
       window.resize(200, 120)
       window.show()
-#      app.exec()
       super
     end
 

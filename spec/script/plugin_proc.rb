@@ -59,7 +59,7 @@ server = PluginJob::Dispatcher.new(host_type,
 
 EM::run do
   server.start
-  launcher.send_sig("TEST")
+  #launcher.send_sig("TEST")
   EM.add_periodic_timer(0.01) do
     host.app.process_events
   end
