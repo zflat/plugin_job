@@ -17,11 +17,19 @@ module PluginJob
       log.info I18n.translate('plugin_job.host.command', :command => @command)
       begin
         if @plugins.has_command?(@command)
-          @plugins[@command].new(self).run
+          job = @plugins[@command].new(self)
+          job.setup
+          if job.valid?
+            job.run
+            log.info I18n.translate('plugin_job.host.completed')
+          else
+            log.error I18n.translate('plugin_job.host.invalid')
+          end
+        else
+          log.info I18n.translate('plugin_job.host.unknown_command')
         end
-        log.info I18n.translate('plugin_job.host.completed')
       rescue
-        log.error I18n.translate('plugin_job.host.completed', :message => $!)
+        log.error I18n.translate('plugin_job.host.error', :message => $!)
       end
     end
     

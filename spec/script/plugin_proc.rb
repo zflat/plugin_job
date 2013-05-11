@@ -13,6 +13,14 @@ class EchoHost < PluginJob::TextHost
   include PluginJob::HostEcho
 end
 
+module MyJobs
+  class Sleepy < PluginJob::Worker
+    def run
+      sleep 2
+    end
+  end
+end
+
 require "log4r"
 include Log4r
 log = Logger.new 'dispatcher'
@@ -20,7 +28,7 @@ if ARGV.include?('stdout')
   log.outputters = Outputter.stdout
 end
 
-plugins = PluginJob::Collection.new({})
+plugins = PluginJob::Collection.new({'MainCategory' => ['Sleepy']}, MyJobs)
 host_type = EchoHost #  PluginJob::TextHost
 server_config = {"host_ip" => "localhost", "port" => 3333}
 server = PluginJob::Dispatcher.new(host_type, 

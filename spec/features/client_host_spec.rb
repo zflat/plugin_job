@@ -17,7 +17,7 @@ module PluginJob
                                   "Port" => 3333
                                 )}
 
-    let(:command){"job"}
+    let(:command){"Sleepy"}
     before :each do
       # capture output to a temp file
       dispatcher.io.stdout = temp_out

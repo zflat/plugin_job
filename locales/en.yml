@@ -7,5 +7,7 @@ en:
     host:
       :command: "Command '%{command}'"
       :completed: "Completed"
+      :unknown_command: "Command not recognized"
       :error: "An error occurred: %{message}"
+      :invalid: "The job could not run due to invalid conditions."
       :block: "Request '%{command}' blocked by an existing job."

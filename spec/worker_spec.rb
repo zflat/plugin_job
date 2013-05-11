@@ -2,7 +2,7 @@ require "spec_helper"
 module PluginJob
   describe Worker do
     context "with default paramaters" do
-      subject(:worker){Worker.new}
+      subject(:worker){Worker.new nil}
       
       it "is valid" do
         expect(worker).to_not be_nil
