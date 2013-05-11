@@ -51,6 +51,7 @@ module PluginJob
       }
     end
 
+    # TODO: Send a signal to the host process to start the job
     def dispatch_job(arg)
       if (h = @host_scope.new(arg, @dispatcher_launch.plugins, 
                               self, @dispatcher_launch.log))

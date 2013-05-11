@@ -22,6 +22,22 @@ module MyJobs
   end
 end
 
+require 'Qt4'
+class AppHost
+  attr_reader :app
+  def initialize
+    @app = app = Qt::Application.new(ARGV)
+  end
+end
+
+class SigLaunch < Qt::Object
+  signals 'sending(QString)'
+
+  def send_sig(arg)
+    emit sending(arg)
+  end
+end
+
 require "log4r"
 include Log4r
 log = Logger.new 'dispatcher'
@@ -31,20 +47,20 @@ end
 
 plugins = PluginJob::Collection.new({'MainCategory' => ['Sleepy']}, MyJobs)
 host_type = EchoHost #  PluginJob::TextHost
+host = AppHost.new
+
+launcher = SigLaunch.new
+
 server_config = {"host_ip" => "localhost", "port" => 3333}
 server = PluginJob::Dispatcher.new(host_type, 
                                    plugins, 
                                    log,
                                    server_config)
 
-require 'Qt4'
-app = Qt::Application.new(ARGV)
-
-
 EM::run do
   server.start
-  #EM.add_periodic_timer(0.01) do
-  #  app.process_events
-  #end
-  app.exec
+  launcher.send_sig("TEST")
+  EM.add_periodic_timer(0.01) do
+    host.app.process_events
+  end
 end
