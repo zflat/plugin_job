@@ -9,7 +9,8 @@ require 'plugin_job'
 require "plugin_job/hosts/text_host"
 require "plugin_job/outputters/host_echo"
 
-class EchoHost < PluginJob::TextHost
+require "plugin_job/hosts/gui_host"
+class EchoHost < PluginJob::GuiHost
   include PluginJob::HostEcho
 end
 
@@ -36,7 +37,14 @@ server = PluginJob::Dispatcher.new(host_type,
                                    log,
                                    server_config)
 
+require 'Qt4'
+app = Qt::Application.new(ARGV)
+
 
 EM::run do
   server.start
+  #EM.add_periodic_timer(0.01) do
+  #  app.process_events
+  #end
+  app.exec
 end
