@@ -6,11 +6,12 @@ module PluginJob
     
     include LogBuilder
     
-    def initialize(command, plugins, connection, log)
+    def initialize(command, host, connection)
+      @host = host
       @connection = connection
       @command = command
-      @plugins = plugins
-      init_log(log, "host")
+      @plugins = host.plugins
+      init_log(host.log, "host")
     end
     
     def launch

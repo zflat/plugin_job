@@ -17,24 +17,28 @@ end
 module MyJobs
   class Sleepy < PluginJob::Worker
     def run
-      sleep 2
+      sleep 10
     end
   end
 end
 
 require 'Qt4'
-class AppHost
-  attr_reader :app
-  def initialize
-    @app = app = Qt::Application.new(ARGV)
-  end
-end
 
 class SigLaunch < Qt::Object
-  signals 'sending(QString)'
+  signals 'run(QString)', 'stop()'
 
-  def send_sig(arg)
-    emit sending(arg)
+  def initialize
+    super
+    self.connect(SIGNAL("run(QString)")) do |arg|
+      @window = Qt::Widget.new()
+      @window.resize(200, 120)
+      @window.show()
+      $qApp.process_events
+    end
+    
+    self.connect(SIGNAL("stop()")) do
+      @window.close
+    end
   end
 end
 
@@ -47,20 +51,17 @@ end
 
 plugins = PluginJob::Collection.new({'MainCategory' => ['Sleepy']}, MyJobs)
 host_type = EchoHost #  PluginJob::TextHost
-host = AppHost.new
-
-launcher = SigLaunch.new
+launch_sender = SigLaunch.new
 
 server_config = {"host_ip" => "localhost", "port" => 3333}
-server = PluginJob::Dispatcher.new(host_type, 
-                                   plugins, 
-                                   log,
-                                   server_config)
+launcher = PluginJob::HostController.new(host_type, plugins, log, launch_sender)
 
+server = PluginJob::Dispatcher.new(launcher, server_config)
+
+app = Qt::Application.new(ARGV)
 EM::run do
   server.start
-  #launcher.send_sig("TEST")
   EM.add_periodic_timer(0.01) do
-    host.app.process_events
+    app.process_events
   end
 end

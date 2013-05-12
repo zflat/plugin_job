@@ -8,16 +8,14 @@ module PluginJob
     
     include LogBuilder
     
-    def initialize(command, plugins, connection, log)
+    def initialize(command, host, connection)
       super
     end
 
     def launch
-      # app = Qt::Application.new(ARGV)
-      window = Qt::Widget.new()
-      window.resize(200, 120)
-      window.show()
+      @host.run @command
       super
+      @host.stop
     end
 
   end # class GuiHost

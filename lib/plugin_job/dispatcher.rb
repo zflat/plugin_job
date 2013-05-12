@@ -8,14 +8,13 @@ module PluginJob
     attr_reader :lock
     attr_reader :command
     
-    def initialize(lock_mutex, host_type, current_dispatcher_launch)
+    def initialize(lock_mutex, host_controller)
       @lock = lock_mutex
-      @host_scope = host_type
-      @dispatcher_launch = current_dispatcher_launch
+      @host_controller = host_controller
     end
     
     def post_init
-      @dispatcher_launch.log.info I18n.translate('plugin_job.dispatcher.connected')
+      @host_controller.log.info I18n.translate('plugin_job.dispatcher.connected')
     end
     
     def receive_data(requested_command)
@@ -29,7 +28,7 @@ module PluginJob
     end # receive_data
     
     def unbind
-      @dispatcher_launch.log.info I18n.translate('plugin_job.dispatcher.disconnected')
+      @host_controller.log.info I18n.translate('plugin_job.dispatcher.disconnected')
     end
 
     private 
@@ -37,12 +36,13 @@ module PluginJob
     def queue_request
       proc {
         if lock.try_lock
-      
+          
+          # TODO: wrap in begin rescue to make sure lock is unlocked
           if command.downcase == "exit"
             EM::stop
+          else
+            dispatch_job command
           end
-          
-          dispatch_job command
           
           lock.unlock
         else # lock.try_lock
@@ -51,42 +51,54 @@ module PluginJob
       }
     end
 
-    # TODO: Send a signal to the host process to start the job
     def dispatch_job(arg)
-      if (h = @host_scope.new(arg, @dispatcher_launch.plugins, 
-                              self, @dispatcher_launch.log))
-        @dispatcher_launch.host = h
+      if (h = @host_controller.create_host(arg,self))
         h.launch
       end
     end
 
     def notify_block
-      @dispatcher_launch.host.block command if @dispatcher_launch.host
+      @host_controller.host.block command if @host_controller.host
     end
   end # class DispatchHandler
 
   # Container class that is used to
   # expose the current host between request threads
   #
-  # Access to the host parameter should always be protected
-  # by a mutex
-  class LaunchHost
-    attr_accessor :host
+  # Access to the host parameter (via create host) 
+  # should always be protected by a mutex
+  #
+  class HostController
+    attr_reader :host
+    attr_reader :host_scope
     attr_reader :plugins
     attr_reader :log
-    def initialize(plugins, log, host = nil)
+    def initialize(host_scope, plugins, log, sender, host = nil)
+      @host_scope = host_scope
       @plugins = plugins
       @log = log
       @host = host
+      @sender = sender
+    end
+
+    def create_host(arg, connection)
+      @host = host_scope.new(arg, self, connection)
+    end
+
+    def run(command)
+      @sender.run(command)
+    end
+
+    def stop
+      @sender.stop
     end
   end
   
   class Dispatcher
 
-    def initialize(host_type, plugins_collection, log=nil, ifconfig={})
-      @host_type = host_type
+    def initialize(host_controller, ifconfig={})
+      @host_controller = host_controller
       @host_lock = Mutex.new
-      @current_host = LaunchHost.new plugins_collection, log
       @ifconfig = ifconfig
     end
     
@@ -104,9 +116,9 @@ module PluginJob
       end
 
       @signature = EM::start_server(ip, port, DispatchHandler, 
-                                    @host_lock, @host_type, @current_host)
+                                    @host_lock, @host_controller)
       
-      @current_host.log.info I18n.translate('plugin_job.dispatcher.started', :port => port)
+      @host_controller.log.info I18n.translate('plugin_job.dispatcher.started', :port => port)
     end
 
     def stop
