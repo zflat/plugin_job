@@ -1,5 +1,6 @@
 require "thread"
 require "eventmachine"
+require "Qt"
 
 module PluginJob
 
@@ -62,44 +63,24 @@ module PluginJob
     end
   end # class DispatchHandler
 
-  # Container class that is used to
-  # expose the current host between request threads
-  #
-  # Access to the host parameter (via create host) 
-  # should always be protected by a mutex
-  #
-  class HostController
-    attr_reader :host
-    attr_reader :host_scope
-    attr_reader :plugins
-    attr_reader :log
-    def initialize(host_scope, plugins, log, sender, host = nil)
-      @host_scope = host_scope
-      @plugins = plugins
-      @log = log
-      @host = host
-      @sender = sender
-    end
-
-    def create_host(arg, connection)
-      @host = host_scope.new(arg, self, connection)
-    end
-
-    def run(command)
-      @sender.run(command)
-    end
-
-    def stop
-      @sender.stop
-    end
-  end
-  
   class Dispatcher
 
     def initialize(host_controller, ifconfig={})
+      # Access to the host_controller (via create host) 
+      # should always be protected by a mutex
       @host_controller = host_controller
       @host_lock = Mutex.new
       @ifconfig = ifconfig
+    end
+
+    def exec_app
+      @app = Qt::Application.new(ARGV)
+      EM::run do
+        self.start
+        EM.add_periodic_timer(0.01) do
+          @app.process_events
+        end
+      end
     end
     
     def start

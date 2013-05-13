@@ -3,6 +3,7 @@ require "plugin_job/configuration"
 require "plugin_job/log_builder"
 require "plugin_job/worker"
 require "plugin_job/dispatcher"
+require "plugin_job/hosts/host_controller"
 require "plugin_job/collection"
 
 require "plugin_job/version"

@@ -51,17 +51,10 @@ end
 
 plugins = PluginJob::Collection.new({'MainCategory' => ['Sleepy']}, MyJobs)
 host_type = EchoHost #  PluginJob::TextHost
-launch_sender = SigLaunch.new
+launcher = SigLaunch.new
 
 server_config = {"host_ip" => "localhost", "port" => 3333}
-launcher = PluginJob::HostController.new(host_type, plugins, log, launch_sender)
+controller = PluginJob::HostController.new(host_type, plugins, log, launcher)
 
-server = PluginJob::Dispatcher.new(launcher, server_config)
-
-app = Qt::Application.new(ARGV)
-EM::run do
-  server.start
-  EM.add_periodic_timer(0.01) do
-    app.process_events
-  end
-end
+server = PluginJob::Dispatcher.new(controller, server_config)
+server.exec_app
