@@ -11,12 +11,12 @@ module PluginJob
     attr_reader :plugins
     attr_reader :log
 
-    def initialize(host_scope, plugins, log, sender, host = nil)
+    def initialize(host_scope, plugins, log, host = nil)
       @host_scope = host_scope
       @plugins = plugins
       @log = log
       @host = host
-      @sender = sender
+      @sender = SigLaunch.new
     end
 
     def create_host(arg, connection)
