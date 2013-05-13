@@ -12,23 +12,16 @@ module PluginJob
     attr_reader :log
 
     def initialize(host_scope, plugins, log, host = nil)
-      @host_scope = host_scope
       @plugins = plugins
       @log = log
-      @host = host
-      @sender = SigLaunch.new
+      @host = host_scope.new
     end
 
-    def create_host(arg, connection)
-      @host = host_scope.new(arg, self, connection)
+    def run_job(arg, connection)
+      # TODO: Connect the host signal :complete to the job
+      @host.next_job = Request.new(arg, self, connection)
+      @host.launch
     end
 
-    def run(command)
-      @sender.run(command)
-    end
-
-    def stop
-      @sender.stop
-    end
   end # class HostController
 end # module PluginJob

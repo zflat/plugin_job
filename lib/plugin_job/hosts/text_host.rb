@@ -1,5 +1,3 @@
-require "plugin_job/outputters/host_echo"
-
 module PluginJob
 
   class TextHost

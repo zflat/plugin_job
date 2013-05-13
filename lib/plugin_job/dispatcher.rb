@@ -53,9 +53,7 @@ module PluginJob
     end
 
     def dispatch_job(arg)
-      if (h = @host_controller.create_host(arg,self))
-        h.launch
-      end
+      @host_controller.run_job(arg,self)
     end
 
     def notify_block

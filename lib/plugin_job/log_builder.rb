@@ -15,7 +15,7 @@ module PluginJob
     def init_log(parent_log, name)
       if @log.nil?
         @log = Logger.new(name)
-        # inherit the outputters from the dispatcher
+        # inherit the outputters from the parent log
         @log.outputters = parent_log.outputters
       end
     end # init_log
