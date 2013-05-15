@@ -1,6 +1,5 @@
 require "thread"
 require "eventmachine"
-require "Qt"
 
 module PluginJob
 
@@ -53,7 +52,7 @@ module PluginJob
     end
 
     def dispatch_job(arg)
-      @host_controller.run_job(arg,self)
+      @host_controller.run_job(arg, self)
     end
 
     def notify_block

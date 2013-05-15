@@ -19,11 +19,17 @@ module PluginJob
 
     def run_job(arg, connection)
       # TODO: Connect the host signal :complete to the job
-      @host.next_job = Request.new(arg, self, connection)
-      if @plugins.has_command?(arg)
-        @host.launch          
-      else
-        @host.log.warn I18n.translate('plugin_job.host.unknown_command')
+      begin
+        @host.next_job = Request.new(arg, self, connection)
+        
+        if @plugins.has_command?(arg)
+          @host.launch          
+        else
+          @host.log.warn I18n.translate('plugin_job.host.unknown_command')
+        end
+
+      rescue
+        log.error I18n.translate('plugin_job.host.error', :message => $!)
       end
     end
 

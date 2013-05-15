@@ -8,6 +8,7 @@ module PluginJob
     # Override log initialization to
     # add the EchoOutputter
     def init_log(parent_log, name)
+      @echo = nil if @log.nil?
       super
       if @echo.nil?
         @echo = EchoOutputter.new('echo', {:connection => @connection})
