@@ -20,7 +20,11 @@ module PluginJob
     def run_job(arg, connection)
       # TODO: Connect the host signal :complete to the job
       @host.next_job = Request.new(arg, self, connection)
-      @host.launch
+      if @plugins.has_command?(arg)
+        @host.launch          
+      else
+        @host.log.warn I18n.translate('plugin_job.host.unknown_command')
+      end
     end
 
   end # class HostController
