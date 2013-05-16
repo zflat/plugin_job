@@ -26,8 +26,8 @@ module PluginJob
           @host.launch          
         else
           @host.log.warn I18n.translate('plugin_job.host.unknown_command')
+          @host.send_prompt
         end
-
       rescue
         log.error I18n.translate('plugin_job.host.error', :message => $!)
       end

@@ -1,4 +1,5 @@
 require "plugin_job/outputters/host_echo"
+require "plugin_job/hosts/widgets/select_launcher"
 require "Qt"
 
 module PluginJob
@@ -10,22 +11,32 @@ module PluginJob
     
     def initialize
       super
-      self.connect(SIGNAL :launch) do |arg|
-        @window = Qt::Widget.new()
-        @window.resize(200, 120)
-        @window.show()
-        $qApp.process_events
-
+      self.connect(SIGNAL :launch) { |arg|
         command = @request.command
         plugins = @request.plugins
 
+        @window = SelectLauncher.new
+        @window.resize(200, 120)
+        @window.show()
+        $qApp.process_events
+        
         log.info command
         @job = plugins[command].new(self)
-        @job.setup
-        @job.run
-        log.info I18n.translate('plugin_job.host.completed')
+
+        # Call the setup step asynchronisly
+        setup_step = Thread.new {@job.setup}
+        setup_step.join
+
+        # Call the run step asynchronisly
+        run_step = Thread.new do 
+          @job.run 
+          log.info I18n.translate('plugin_job.host.completed')          
+        end
+        run_step.join
+
+        send_prompt
         clear_job
-      end
+      }
     end # initialize
 
     def next_job=(request)
@@ -37,9 +48,14 @@ module PluginJob
 
     def block(request)
       log.warn "Request #{request} blocked..."
+      send_prompt
+    end
+
+    def send_prompt
     end
 
     private
+
     def clear_job
       @request = nil
       @connection = nil

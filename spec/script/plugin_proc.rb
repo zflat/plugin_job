@@ -34,6 +34,12 @@ require "plugin_job/hosts/gui_host"
 require "plugin_job/outputters/host_echo"
 class EchoHost < PluginJob::GuiHost
   include PluginJob::HostEcho
+
+  def send_prompt
+    if @connection
+      @connection.send_data "#> "
+    end
+  end
 end
 controller = PluginJob::HostController.new(EchoHost, plugins, log)
 

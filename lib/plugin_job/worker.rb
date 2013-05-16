@@ -1,13 +1,14 @@
-require "eventmachine"
+require "Qt"
 
 module PluginJob
   class Worker
-    
+
     def initialize(host)
       @host = host
     end
     
     def setup
+      
     end
     
     def valid?
