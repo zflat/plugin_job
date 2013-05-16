@@ -18,32 +18,39 @@ module PluginJob
         @window = SelectLauncher.new
         @window.resize(200, 120)
         @window.show()
-        $qApp.process_events
         
         log.info command
-        @job = plugins[command].new(self)
+        
+        # Run the setup step asynchronisly
+        @setup_step = Thread.new {@request.setup}
 
-        # Call the setup step asynchronisly
-        setup_step = Thread.new {@job.setup}
-        setup_step.join
+      }
+    end # initialize
 
-        # Call the run step asynchronisly
-        run_step = Thread.new do 
-          @job.run 
-          log.info I18n.translate('plugin_job.host.completed')          
-        end
-        run_step.join
+    def after_setup
+      proc {
+        # Execute the Run step asynchronisly
+        @run_step = Thread.new { @request.run }
+      }
+    end
 
+    def after_run
+      proc {
+        log.info I18n.translate('plugin_job.host.completed')
         send_prompt
         clear_job
       }
-    end # initialize
+    end
 
     def next_job=(request)
       clear_job
       @request = request
       @connection = request.connection
       init_log(request.log, "host")
+      
+      # Job step callbacks
+      @request.after_setup = after_setup
+      @request.after_run = after_run
     end
 
     def block(request)

@@ -21,7 +21,7 @@ end
 module MyJobs
   class Sleepy < PluginJob::Worker
     def run
-      sleep 10
+      sleep 5
     end
   end
 end
