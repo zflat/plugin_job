@@ -23,7 +23,6 @@ module PluginJob
         
         # Run the setup step asynchronisly
         @setup_step = Thread.new {@request.setup}
-
       }
     end # initialize
 
@@ -39,6 +38,7 @@ module PluginJob
         log.info I18n.translate('plugin_job.host.completed')
         send_prompt
         clear_job
+        self.complete
       }
     end
 
