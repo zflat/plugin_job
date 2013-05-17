@@ -30,19 +30,6 @@ module PluginJob
       after_run.call
     end
 
-    private
-    def launch
-      begin
-        if @plugins.has_command?(@command)
-          @controller.run @command
-        else
-log.info I18n.translate('plugin_job.host.unknown_command')
-        end
-      rescue
-        log.error I18n.translate('plugin_job.host.error', :message => $!)
-      end
-    end
-
   end # class Request
 
 end # module PluginJob

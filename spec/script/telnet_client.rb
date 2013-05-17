@@ -10,7 +10,7 @@ localhost = Net::Telnet::new("Host" => "localhost",
                                "Port" => 3333,
                                "Telnetmode" => false)
 
-print "> "
+print "#> "
 cmd = ""
 while cmd != 'exit'
 

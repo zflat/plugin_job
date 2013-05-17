@@ -5,7 +5,10 @@ module PluginJob
   describe Dispatcher do
     let(:log){Logger.new 'disp_spec'}
     let(:plugins_collection){ Collection.new({}) }
-    subject(:server){Dispatcher.new(TextHost, plugins_collection, log, {})}
+    
+    let(:controller){ HostController.new(TextHost, plugins_collection, log)}
+    let(:server_config){ Hash.new }
+    subject(:server){Dispatcher.new(controller, server_config)}
 
     it "starts and stops", :if => true do
       EventMachine::run do
