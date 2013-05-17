@@ -22,11 +22,6 @@ module PluginJob
       @job = plugins[@command].new(@controller.host)
       @job.setup
       
-      # Get computer name info
-      # http://www.codeproject.com/Articles/7088/How-to-Get-Windows-Directory-Computer-Name-and-Sys
-      # http://newsgroups.derkeiler.com/Archive/Comp/comp.lang.ruby/2008-04/msg01780.html
-      # http://www.ruby-forum.com/topic/152169
-      log.info "#{@command} #{Time.now} #{Socket.gethostname} #{ENV['USERNAME']}"
       # Signal setup complete
       after_setup.call      
     end
