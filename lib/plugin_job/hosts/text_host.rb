@@ -14,18 +14,23 @@ module PluginJob
     end # initialize
     
     def process_request(arg)
-      command = @request.command
-      plugins = @request.plugins
+      @command = @request.command
+      @plugins = @request.plugins
       
       # Run the setup step asynchronisly
       @setup_step = Thread.new {
-        log.info command
         @request.setup
       }
     end
 
     def after_setup
       proc {
+        # Get computer name info
+        # http://www.codeproject.com/Articles/7088/How-to-Get-Windows-Directory-Computer-Name-and-Sys
+        # http://newsgroups.derkeiler.com/Archive/Comp/comp.lang.ruby/2008-04/msg01780.html
+        # http://www.ruby-forum.com/topic/152169
+        log.info "#{@command} #{Time.now} #{Socket.gethostname} #{ENV['USERNAME']}"
+
         # Execute the Run step asynchronisly
         @run_step = Thread.new { @request.run }
       }
