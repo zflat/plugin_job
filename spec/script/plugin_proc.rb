@@ -21,7 +21,11 @@ end
 module MyJobs
   class Sleepy < PluginJob::Worker
     def run
-      sleep 5
+      (1..25).to_a.each do |i|
+        log.info("..#{i}..")
+        sleep 0.1
+      end
+      log.warn("Nothing usefull accomplished.")
     end
   end
 end
@@ -41,6 +45,7 @@ class EchoHost < PluginJob::GuiHost
     end
   end
 end
+
 controller = PluginJob::HostController.new(EchoHost, plugins, log)
 
 ###################

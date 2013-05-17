@@ -6,14 +6,6 @@ module PluginJob
 
     signals :complete, :launch
     
-    def initialize2(command, host, connection)
-      @host = host
-      @connection = connection
-      @command = command
-      @plugins = host.plugins
-      init_log(host.log, "host")
-    end
-
     def initialize
       super
       self.connect(SIGNAL :launch) { |arg|
@@ -24,10 +16,12 @@ module PluginJob
     def process_request(arg)
       command = @request.command
       plugins = @request.plugins
-      log.info command
       
       # Run the setup step asynchronisly
-      @setup_step = Thread.new {@request.setup}
+      @setup_step = Thread.new {
+        log.info command
+        @request.setup
+      }
     end
 
     def after_setup

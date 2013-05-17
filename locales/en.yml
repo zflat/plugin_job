@@ -11,3 +11,5 @@ en:
       :error: "An error occurred: %{message}"
       :invalid: "The job could not run due to invalid conditions."
       :block: "Request '%{command}' blocked by an existing job."
+    launcher:
+      :title: "Launcher"

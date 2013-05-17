@@ -8,7 +8,8 @@ module PluginJob
     
     def process_request(arg)
       @window = SelectLauncher.new
-      @window.resize(200, 120)
+      @window.resize(600, 400)
+      @window.attach_log_listeners(log)
       @window.show()
 
       super

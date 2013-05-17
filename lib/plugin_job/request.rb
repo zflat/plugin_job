@@ -18,7 +18,7 @@ module PluginJob
     end # initialize
 
     def setup
-      @job = plugins[@command].new(self)
+      @job = plugins[@command].new(@controller.host)
       @job.setup
       # Signal setup complete
       after_setup.call      

@@ -13,11 +13,9 @@ module PluginJob
     # Call init_log from the initializer
     # in the class that includes this module
     def init_log(parent_log, name)
-      if @log.nil?
-        @log = Logger.new(name)
-        # inherit the outputters from the parent log
-        @log.outputters = parent_log.outputters
-      end
+      @log = Logger.new(name)
+      # inherit the outputters from the parent log
+      @log.outputters = parent_log.outputters
     end # init_log
 
   end # module LogBuilder

@@ -45,8 +45,12 @@ module PluginJob
 
     def run_job(arg, connection)
       begin
-        @host.next_job = Request.new(arg, self, connection)
+
+        # Make sure the logs inherit in the right order
+        # Controller > Request > Host > Worker
         
+        @host.next_job = Request.new(arg, self, connection)
+
         if @plugins.has_command?(arg)
           @host.launch
           job_started
