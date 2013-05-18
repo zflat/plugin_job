@@ -1,4 +1,4 @@
-require "plugin_job/outputters/host_echo"
+require "plugin_job/hosts/text_host"
 require "plugin_job/hosts/widgets/select_launcher"
 require "Qt"
 
