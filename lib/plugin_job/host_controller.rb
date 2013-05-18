@@ -63,7 +63,7 @@ module PluginJob
           }
           @job_wait.join
         else
-          @host.log.warn I18n.translate('plugin_job.host.unknown_command')
+          @host.log.warn I18n.translate('plugin_job.host.unknown_command', :command => arg)
         end
       rescue
         log.error I18n.translate('plugin_job.host.error', :message => $!)

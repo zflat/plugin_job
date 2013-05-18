@@ -4,12 +4,24 @@ module PluginJob
     
     include LogBuilder
 
-    signals :complete, :launch
+    signals :complete, :launch, :kill
     
     def initialize
       super
+
+      # Hash containing execution steps
+      @steps = {}
+
       self.connect(SIGNAL :launch) { |arg|
         process_request(arg)
+      }
+
+      self.connect(SIGNAL :kill){
+        # end any running steps
+        @steps.each do |key, val|
+          Thread.kill(val)
+        end
+        end_job
       }
     end # initialize
     
@@ -18,31 +30,25 @@ module PluginJob
       @plugins = @request.plugins
       
       # Run the setup step asynchronisly
-      @setup_step = Thread.new {
+
+      @steps[:setup] = Thread.new {
         @request.setup
       }
     end
 
     def after_setup
-      proc {
-        # Get computer name info
-        # http://www.codeproject.com/Articles/7088/How-to-Get-Windows-Directory-Computer-Name-and-Sys
-        # http://newsgroups.derkeiler.com/Archive/Comp/comp.lang.ruby/2008-04/msg01780.html
-        # http://www.ruby-forum.com/topic/152169
-        log.info "#{@command} #{Time.now} #{Socket.gethostname} #{ENV['USERNAME']}"
-
-        # Execute the Run step asynchronisly
-        @run_step = Thread.new { @request.run }
-      }
+      # Get computer name info
+      # http://www.codeproject.com/Articles/7088/How-to-Get-Windows-Directory-Computer-Name-and-Sys
+      # http://newsgroups.derkeiler.com/Archive/Comp/comp.lang.ruby/2008-04/msg01780.html
+      # http://www.ruby-forum.com/topic/152169
+      log.info "#{@command} #{Time.now} #{Socket.gethostname} #{ENV['USERNAME']}"
+      
+      # Execute the Run step asynchronisly
+      @steps[:run] = Thread.new {@request.run}
     end
 
     def after_run
-      proc {
-        log.info I18n.translate('plugin_job.host.completed')
-        send_prompt
-        clear_job
-        self.complete
-      }
+      end_job
     end
 
     def next_job=(request)
@@ -52,8 +58,14 @@ module PluginJob
       init_log(request.log, "host")
       
       # Job step callbacks
-      @request.after_setup = after_setup
-      @request.after_run = after_run
+      @request.after_setup = method(:after_setup)
+      @request.after_run = method(:after_run)
+    end
+
+    def end_job
+      send_prompt
+      clear_job
+      self.complete
     end
 
     def block(command)

@@ -5,6 +5,8 @@ require "Qt"
 module PluginJob
 
   class SelectLauncher < Qt::MainWindow
+
+    signals :close
     
     def initialize
       super
@@ -17,11 +19,12 @@ module PluginJob
 
       @tabs = Qt::TabWidget.new
       @log_page = LogText.new
-      @tabs.addTab(@log_page, "Log")
+
+      @tabs.addTab(@log_page, I18n.translate('plugin_job.widget.select_launcher.tab.log'))
       @log_page.showMaximized()
 
       @error_page = LogText.new
-      @tabs.addTab(@error_page, "Errors & Warnings")
+      @tabs.addTab(@error_page, I18n.translate('plugin_job.widget.select_launcher.tab.error'))
       
       self.setCentralWidget(@tabs)
     end
@@ -34,9 +37,13 @@ module PluginJob
       log.add(@log_all)
       log.add(@log_error)
     end
+
+    def attach_kill_signal(parent)
+      @kill_reciever = parent
+    end
     
     def closeEvent(event)
-      puts "Close event sent"
+      emit close
       super
     end
     

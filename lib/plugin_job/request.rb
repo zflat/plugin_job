@@ -28,6 +28,7 @@ module PluginJob
 
     def run
       @job.run
+      @job.log.info I18n.translate('plugin_job.host.completed')
       # Signal run complete
       after_run.call
     end
