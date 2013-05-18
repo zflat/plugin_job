@@ -16,13 +16,8 @@ module PluginJob
         @window_closed = true
       }
 
-      # @window.attach_kill_signal(self)
+      show_window
 
-      # Show window on top
-      # See https://qt-project.org/forums/viewthread/1971/#9042
-      @window.showNormal
-      @window.raise
-      @window.activateWindow
       super
     end # process_request
 
@@ -35,7 +30,17 @@ module PluginJob
       super
     end
 
-    def send_prompt
+    def show_window
+      # Show window on top
+      # See https://qt-project.org/forums/viewthread/1971/#9042
+      @window.showNormal
+      @window.raise
+      @window.activateWindow
+      @window_closed = false
+    end
+
+    def block(command)
+      show_window
     end
 
   end # class GuiHost

@@ -44,6 +44,11 @@ class EchoHost < PluginJob::GuiHost
       @connection.send_data "#> "
     end
   end
+
+  def block(command)
+    super
+    log.warn I18n.translate('plugin_job.host.block', :command => command)
+  end
 end
 
 controller = PluginJob::HostController.new(EchoHost, plugins, log)
