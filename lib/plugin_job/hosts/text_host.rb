@@ -5,6 +5,8 @@ module PluginJob
     include LogBuilder
 
     signals :complete, :launch, :kill
+
+    attr_reader :plugins
     
     def initialize
       super
@@ -24,13 +26,17 @@ module PluginJob
         end_job
       }
     end # initialize
+
+    def command
+      @request.command
+    end
+
+    def plugins
+      @request.plugins
+    end
     
     def process_request(arg)
-      @command = @request.command
-      @plugins = @request.plugins
-      
       # Run the setup step asynchronisly
-
       @steps[:setup] = Thread.new {
         @request.setup
       }
@@ -41,7 +47,7 @@ module PluginJob
       # http://www.codeproject.com/Articles/7088/How-to-Get-Windows-Directory-Computer-Name-and-Sys
       # http://newsgroups.derkeiler.com/Archive/Comp/comp.lang.ruby/2008-04/msg01780.html
       # http://www.ruby-forum.com/topic/152169
-      log.info "#{@command} #{Time.now} #{Socket.gethostname} #{ENV['USERNAME']}"
+      log.info "#{command} #{Time.now} #{Socket.gethostname} #{ENV['USERNAME']}"
       
       # Execute the Run step asynchronisly
       @steps[:run] = Thread.new {@request.run}

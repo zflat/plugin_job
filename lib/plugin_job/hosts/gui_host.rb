@@ -11,6 +11,19 @@ module PluginJob
       @window.resize(600, 400)
       @window.attach_log_listeners(log)
 
+      @window.populate_command_options(plugins.command_list)
+
+      if true || arg == ""
+        # Show list selection
+        @window.connect(SIGNAL("command_selected(QString)")){ |arg|
+          puts "command selected: #{arg}"
+        }
+        puts "selected connected"
+      else
+        # Show current selection
+        # Disable selection
+      end
+
       @window.connect(SIGNAL :close){
         self.kill
         @window_closed = true

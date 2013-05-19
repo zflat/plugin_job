@@ -28,8 +28,20 @@ module MyJobs
       log.warn("Nothing usefull accomplished.")
     end
   end
+  
+  class Print < PluginJob::Worker
+    def run
+      log.info "Printing output text"
+    end
+  end
+
+  class Hello < PluginJob::Worker
+    def run
+      log.info "Hello, World!"
+    end
+  end
 end
-plugins = PluginJob::Collection.new({'MainCategory' => ['Sleepy']}, MyJobs)
+plugins = PluginJob::Collection.new({'MainCategory' => ['Sleepy', 'Hello', 'Print']}, MyJobs)
 
 #######################
 # Create the controller
