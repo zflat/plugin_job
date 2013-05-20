@@ -51,8 +51,8 @@ module PluginJob
         
         @host.next_job = Request.new(arg, self, connection)
 
-        if @plugins.has_command?(arg)
-          @host.launch
+        if @plugins.has_command?(arg) || arg == ""
+          @host.launch(arg)
           job_started
           
           # Block until job is finished

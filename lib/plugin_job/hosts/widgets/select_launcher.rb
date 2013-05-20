@@ -1,4 +1,5 @@
 require "plugin_job/hosts/widgets/log_text"
+require "plugin_job/hosts/widgets/job_selection_form"
 require "plugin_job/outputters/qt_plain_text_outputter"
 require "Qt"
 
@@ -7,6 +8,8 @@ module PluginJob
   class SelectLauncher < Qt::MainWindow
 
     signals :close, "command_selected(QString)"
+
+    attr_reader :select_form
     
     def initialize
       super
@@ -21,25 +24,13 @@ module PluginJob
       @central = Qt::Widget.new
       @central_layout = Qt::VBoxLayout.new
 
-      # create the job selection form
-      @select_form = Qt::Widget.new
-      @select_label = Qt::Label.new("Job:", @select_form)
-      @select_box = Qt::ComboBox.new(@select_form)
-      @select_btn = Qt::PushButton.new("Run", @select_form)
+      # job selection form
+      @select_form = JobSelectionForm.new
 
-      @select_btn.connect(SIGNAL :clicked) {
-        puts "clicked"
-        emit command_selected(@select_box.currentText)
-        @select_box.setEnabled(false)
-        @select_btn.setEnabled(false)
-      }
+      # placeholder for job UI
       
-      @select_layout = Qt::HBoxLayout.new
-      @select_layout.addWidget(@select_label)
-      @select_layout.addWidget(@select_box)
-      @select_layout.addWidget(@select_btn)
-      @select_form.setLayout(@select_layout)
       
+
       # create the tabs
       @tabs = Qt::TabWidget.new
       @log_page = LogText.new
@@ -59,9 +50,7 @@ module PluginJob
     end
 
     def populate_command_options(commands)
-      commands.each do |c|
-        @select_box.addItem(c.to_s)
-      end
+      @select_form.populate_command_options(commands)
     end
 
     def attach_log_listeners(log)
@@ -80,8 +69,8 @@ module PluginJob
     def closeEvent(event)
       emit close
       super
-    end
+    end # closeEvent
     
-  end
+  end # class SelectLauncher < Qt::MainWindow
 
-end
+end # module PluginJob

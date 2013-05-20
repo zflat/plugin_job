@@ -6,32 +6,36 @@ module PluginJob
 
   class GuiHost < TextHost
     
-    def process_request(arg)
-      @window = SelectLauncher.new
-      @window.resize(600, 400)
-      @window.attach_log_listeners(log)
+    def process_request(command)
+      if @window.nil?
+        @window = SelectLauncher.new
+        @window.resize(600, 400)
+        @window.attach_log_listeners(log)
 
-      @window.populate_command_options(plugins.command_list)
+        @window.populate_command_options(plugins.command_list)
 
-      if true || arg == ""
-        # Show list selection
-        @window.connect(SIGNAL("command_selected(QString)")){ |arg|
-          puts "command selected: #{arg}"
+        @window.connect(SIGNAL :close){
+          self.kill
+          @window_closed = true
         }
-        puts "selected connected"
-      else
-        # Show current selection
-        # Disable selection
+
+        @window.select_form.connect(SIGNAL("command_selected(QString)")){ |arg|
+          @request.command = arg
+          puts "command selected: #{arg}"
+          process_request(arg)
+        }
+
+        show_window
+
+        if command != ""
+          # Show current selection
+          @window.select_form.select(command)
+        end
       end
 
-      @window.connect(SIGNAL :close){
-        self.kill
-        @window_closed = true
-      }
-
-      show_window
-
-      super
+      if command != ""      
+        super
+      end
     end # process_request
 
     def after_run
@@ -54,6 +58,11 @@ module PluginJob
 
     def block(command)
       show_window
+    end
+
+    def clear_job
+      super
+      @window = nil
     end
 
   end # class GuiHost

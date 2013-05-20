@@ -4,7 +4,7 @@ module PluginJob
     
     include LogBuilder
 
-    signals :complete, :launch, :kill
+    signals :complete, :kill, "launch(QString)"
 
     attr_reader :plugins
     
@@ -14,7 +14,7 @@ module PluginJob
       # Hash containing execution steps
       @steps = {}
 
-      self.connect(SIGNAL :launch) { |arg|
+      self.connect(SIGNAL("launch(QString)")) { |arg|
         process_request(arg)
       }
 
@@ -36,10 +36,12 @@ module PluginJob
     end
     
     def process_request(arg)
-      # Run the setup step asynchronisly
-      @steps[:setup] = Thread.new {
-        @request.setup
-      }
+      if arg != ""
+        # Run the setup step asynchronisly
+        @steps[:setup] = Thread.new {
+          @request.setup
+        }
+      end
     end
 
     def after_setup

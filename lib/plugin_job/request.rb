@@ -5,8 +5,8 @@ require "socket"
 module PluginJob
 
   class Request
-    attr_reader :command, :connection, :plugins
-    attr_accessor :after_setup, :after_run
+    attr_reader :connection, :plugins
+    attr_accessor :after_setup, :after_run, :command
     
     include LogBuilder
 
@@ -23,7 +23,7 @@ module PluginJob
       @job.setup
       
       # Signal setup complete
-      after_setup.call      
+      after_setup.call
     end
 
     def run
