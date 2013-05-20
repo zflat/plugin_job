@@ -62,10 +62,6 @@ module PluginJob
       log.add(@log_error)
     end
 
-    def attach_kill_signal(parent)
-      @kill_reciever = parent
-    end
-    
     def closeEvent(event)
       emit close
       super

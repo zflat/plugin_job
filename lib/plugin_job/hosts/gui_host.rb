@@ -21,7 +21,6 @@ module PluginJob
 
         @window.select_form.connect(SIGNAL("command_selected(QString)")){ |arg|
           @request.command = arg
-          puts "command selected: #{arg}"
           process_request(arg)
         }
 
@@ -31,9 +30,7 @@ module PluginJob
           # Show current selection
           @window.select_form.select(command)
         end
-      end
-
-      if command != ""      
+      elsif command != ""      
         super
       end
     end # process_request
