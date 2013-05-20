@@ -1,4 +1,4 @@
-require 'Qt4'
+require 'Qt'
 
 module PluginJob
   # Controller class that is used to

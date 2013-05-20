@@ -7,7 +7,7 @@ module PluginJob
 
   class SelectLauncher < Qt::MainWindow
 
-    signals :close, "command_selected(QString)"
+    signals :close_sig, "command_selected(QString)"
 
     attr_reader :select_form
     
@@ -19,6 +19,11 @@ module PluginJob
       @statusbar = Qt::StatusBar.new(self)
       @statusbar.setObjectName('statusbar')
       self.setStatusBar(@statusbar)
+      
+      @progressbar = Qt::ProgressBar.new
+      @progressbar.setMinimum(0)
+      @progressbar.setMaximum(100)
+      # @statusbar.addWidget(@progressbar)
 
       # create the central widget
       @central = Qt::Widget.new
@@ -63,9 +68,21 @@ module PluginJob
     end
 
     def closeEvent(event)
-      emit close
+      emit close_sig
       super
     end # closeEvent
+
+    def notify_errors
+      @statusbar.setStyleSheet("QStatusBar {background: red}")
+    end
+
+    def notify_warnings
+      @statusbar.setStyleSheet("QStatusBar {background: yellow}")
+    end
+
+    def notify_success
+      @statusbar.setStyleSheet("QStatusBar {background: green}")      
+    end
     
   end # class SelectLauncher < Qt::MainWindow
 

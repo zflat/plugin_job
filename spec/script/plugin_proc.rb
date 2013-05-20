@@ -33,6 +33,17 @@ module MyJobs
     def run
       log.info "Printing output text"
     end
+
+    def silent?
+      true
+    end
+  end
+
+  class BadPrint < Print
+    def run
+      super
+      log.error "Bad...print"
+    end
   end
 
   class Hello < PluginJob::Worker
@@ -41,7 +52,12 @@ module MyJobs
     end
   end
 end
-plugins = PluginJob::Collection.new({'MainCategory' => ['Sleepy', 'Hello', 'Print']}, MyJobs)
+plugins = PluginJob::Collection.new({'MainCategory' =>
+                                      ['Sleepy', 
+                                       'Hello', 
+                                       'Print', 
+                                       'BadPrint']
+                                    }, MyJobs)
 
 #######################
 # Create the controller

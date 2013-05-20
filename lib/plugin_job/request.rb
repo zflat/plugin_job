@@ -5,7 +5,7 @@ require "socket"
 module PluginJob
 
   class Request
-    attr_reader :connection, :plugins
+    attr_reader :connection, :plugins, :job
     attr_accessor :after_setup, :after_run, :command
     
     include LogBuilder
