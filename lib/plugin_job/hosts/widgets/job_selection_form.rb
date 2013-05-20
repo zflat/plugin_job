@@ -9,9 +9,12 @@ module PluginJob
     def initialize(parent=nil)
       super(parent)
 
-      @label = Qt::Label.new("Job:", self)
+      @label = Qt::Label.new("#{I18n.translate('plugin_job.launcher.select_label')}:", self)
+      @label.setSizePolicy(Qt::SizePolicy::Fixed, Qt::SizePolicy::Fixed)
+
       @box = Qt::ComboBox.new(self)
-      @btn = Qt::PushButton.new("Run", self)
+      @btn = Qt::PushButton.new(I18n.translate('plugin_job.launcher.select_btn'), self)
+      @btn.setSizePolicy(Qt::SizePolicy::Fixed, Qt::SizePolicy::Fixed)
 
       @btn.connect(SIGNAL :clicked) {
         # select_job(

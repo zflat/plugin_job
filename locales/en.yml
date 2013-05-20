@@ -14,6 +14,8 @@ en:
       :window_close_wait: "Waiting for window to close."
     launcher:
       :title: "Launcher"
+      :select_label: "Job"
+      :select_btn: "Run"
     widget:
       :select_launcher:
         :tab:
