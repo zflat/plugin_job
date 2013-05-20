@@ -1,3 +1,5 @@
+require "Qt"
+
 module PluginJob
 
   class TextHost < Qt::Object
