@@ -22,25 +22,22 @@ module PluginJob
 
     def job_finished?
       finished = nil
-      if @job_status_lock.lock
+      @job_status_lock.synchronize {
         finished = @complete
-        @job_status_lock.unlock
-      end
+      }
       return finished
     end
 
     def job_finished
-      if @job_status_lock.lock
+      @job_status_lock.synchronize {
         @complete = true
-        @job_status_lock.unlock
-      end
+      }
     end
 
     def job_started
-      if @job_status_lock.lock
+      @job_status_lock.synchronize {
         @complete = false
-        @job_status_lock.unlock
-      end
+      }
     end
 
     def run_job(arg, connection)
@@ -49,11 +46,11 @@ module PluginJob
         # Make sure the logs inherit in the right order
         # Controller > Request > Host > Worker
         
-        @host.next_job = Request.new(arg, self, connection)
-
         if @plugins.has_command?(arg) || arg == ""
-          @host.launch(arg)
+
           job_started
+          @host.next_job = Request.new(arg, self, connection)
+          @host.launch(arg)
           
           # Block until job is finished
           @job_wait = Thread.new {

@@ -75,7 +75,7 @@ module PluginJob
     def end_job
       send_prompt
       clear_job
-      self.complete
+      emit complete
     end
 
     def block(command)

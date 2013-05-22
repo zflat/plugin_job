@@ -5,22 +5,29 @@ module PluginJob
 
   class DispatchHandler < EventMachine::Connection
     
-    attr_reader :lock
+    attr_reader :block, :host_sem
     attr_reader :command
     
-    def initialize(lock_mutex, host_controller)
-      @lock = lock_mutex
+    def initialize(host_controller, job_mutex, host_mutex)
+      # Use the mutext to ensure let a running job block
+      @block = job_mutex
+      
+      # Use a mutex to make sure only one request is sent to the host at a time
+      @host_sem = host_mutex
+
       @host_controller = host_controller
     end
     
     def post_init
-      @host_controller.log.info I18n.translate('plugin_job.dispatcher.connected')
+      host_sem.synchronize {
+        @host_controller.log.info I18n.translate('plugin_job.dispatcher.connected')
+      }
     end
     
     def receive_data(requested_command)
       return if requested_command.nil?
       @command = requested_command.to_s.strip
-      if lock.locked?
+      if block.locked?
         notify_block
       else
         EM.defer queue_request
@@ -28,14 +35,16 @@ module PluginJob
     end # receive_data
     
     def unbind
-      @host_controller.log.info I18n.translate('plugin_job.dispatcher.disconnected')
+      host_sem.synchronize {
+        @host_controller.log.info I18n.translate('plugin_job.dispatcher.disconnected')
+      }
     end
 
     private 
 
     def queue_request
       proc {
-        if lock.try_lock
+        if block.try_lock
           
           # TODO: wrap in begin rescue to make sure lock is unlocked
           if command.downcase == "exit"
@@ -44,7 +53,7 @@ module PluginJob
             dispatch_job command
           end
           
-          lock.unlock
+          block.unlock
         else # lock.try_lock
           notify_block
         end # lock.try_lock
@@ -56,7 +65,9 @@ module PluginJob
     end
 
     def notify_block
-      @host_controller.host.block command if @host_controller.host
+      host_sem.synchronize {
+        @host_controller.host.block command if @host_controller.host
+      }
     end
   end # class DispatchHandler
 
@@ -66,6 +77,7 @@ module PluginJob
       # Access to the host_controller (via create host) 
       # should always be protected by a mutex
       @host_controller = host_controller
+      @job_lock = Mutex.new
       @host_lock = Mutex.new
       @ifconfig = ifconfig
     end
@@ -94,9 +106,11 @@ module PluginJob
       end
 
       @signature = EM::start_server(ip, port, DispatchHandler, 
-                                    @host_lock, @host_controller)
+                                    @host_controller, @job_lock, @host_lock)
       
-      @host_controller.log.info I18n.translate('plugin_job.dispatcher.started', :port => port)
+      @host_lock.synchronize {
+        @host_controller.log.info I18n.translate('plugin_job.dispatcher.started', :port => port)
+      }
     end
 
     def stop

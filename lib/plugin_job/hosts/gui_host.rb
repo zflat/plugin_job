@@ -10,6 +10,7 @@ module PluginJob
     def process_request(command)
       if @window.nil?
         @window = SelectLauncher.new
+        @window.setWindowTitle("#{command} |  #{I18n.translate('plugin_job.launcher.title')}")
         @window.resize(600, 400)
         @window.attach_log_listeners(log)
 
@@ -89,10 +90,12 @@ module PluginJob
     def show_window
       # Show window on top
       # See https://qt-project.org/forums/viewthread/1971/#9042
-      @window.showNormal
-      @window.raise
-      @window.activateWindow
-      @window_closed = false
+      unless @window.nil?
+        @window.showNormal
+        @window.raise
+        @window.activateWindow
+        @window_closed = false
+      end
     end
 
     def notify_errors
