@@ -10,9 +10,9 @@ module PluginJob
     def process_request(command)
       if @window.nil?
         @window = SelectLauncher.new
-        @window.setWindowTitle("#{command} |  #{I18n.translate('plugin_job.launcher.title')}")
         @window.resize(600, 400)
         @window.attach_log_listeners(log)
+        @window.populate_command_options(plugins.command_list)
 
         # watch for errors and warnings
         @err_watch = FlagOutputter.new("errors warnings fatal")
@@ -21,8 +21,6 @@ module PluginJob
         @warn_watch = FlagOutputter.new("errors warnings fatal")
         @warn_watch.only_at WARN
         log.add(@warn_watch)
-        
-        @window.populate_command_options(plugins.command_list)
 
         @window.connect(SIGNAL :close_sig){
           self.kill
@@ -42,6 +40,7 @@ module PluginJob
         show_window
 
       elsif command != ""      
+        @window.setWindowTitle("#{command} |  #{I18n.translate('plugin_job.launcher.title')}")
         super
       end
     end # process_request
@@ -52,9 +51,9 @@ module PluginJob
         @window.showMinimized
       end
 
-      # add widget to GUI if necessary
+      # add job widget to GUI if necessary
       if @request.job.respond_to?(:widget)
-        # @request.job.widget
+        @window.attach_widget(@request.job.widget)
       end
 
       super
@@ -77,11 +76,14 @@ module PluginJob
         @window.close
         super
       else
-        # Block until window is closed
+        # Block in the background until window is closed
         log.info I18n.translate('plugin_job.host.window_close_wait')
-        while( ! @window_closed )
-          Thread.sleep 0.1
-        end
+        #@window_wait = Thread.new{
+         # while( ! @window_closed )
+            sleep 0.1
+         # end
+        #}
+        #@window_wait.join
         super
       end # if end_silent
 

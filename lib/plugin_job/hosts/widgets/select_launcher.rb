@@ -33,9 +33,12 @@ module PluginJob
       @select_form = JobSelectionForm.new
 
       # placeholder for job UI
-      
-      
+      @job_ui = Qt::Widget.new
+      @job_ui_layout = Qt::VBoxLayout.new
+      # @job_ui_layout.addWidget(w)
+      @job_ui.setLayout(@job_ui_layout)
 
+      
       # create the tabs
       @tabs = Qt::TabWidget.new
       @log_page = LogText.new
@@ -48,6 +51,7 @@ module PluginJob
       
       # Add components to the layout
       @central_layout.addWidget(@select_form)
+      @central_layout.addWidget(@job_ui)
       @central_layout.addWidget(@tabs)
 
       @central.setLayout(@central_layout)
@@ -84,6 +88,14 @@ module PluginJob
 
       log.add(@log_all)
       log.add(@log_error)
+    end
+
+    def attach_widget(w)
+      # @job_ui_layout = Qt::VBoxLayout.new
+      @job_ui_layout.addWidget(w)
+      # @job_ui.setLayout(@job_ui_layout)
+      # may need to use w.setParent(@job_ui) ? 
+      puts "setting widget"
     end
 
     def closeEvent(event)

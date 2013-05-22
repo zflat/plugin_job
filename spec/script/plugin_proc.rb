@@ -47,8 +47,19 @@ module MyJobs
   end
 
   class Hello < PluginJob::Worker
+    class HelloWidget < Qt::Widget
+      
+    end
+
     def run
       log.info "Hello, World!"
+    end
+
+    def widget
+      if @widget.nil?
+        @widget = Qt::Label.new("Hello form :)")
+      end
+      @widget
     end
   end
 end
