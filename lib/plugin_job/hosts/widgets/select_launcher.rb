@@ -1,13 +1,13 @@
 require "plugin_job/hosts/widgets/log_text"
 require "plugin_job/hosts/widgets/job_selection_form"
-require "plugin_job/outputters/qt_plain_text_outputter"
+require "plugin_job/outputters/emitter_outputter"
 require "Qt"
 
 module PluginJob
 
   class SelectLauncher < Qt::MainWindow
 
-    signals :close_sig, "command_selected(QString)"
+    signals :close_sig, "command_selected(QString)", :notify_errors, :notify_warnings, :notify_success
 
     attr_reader :select_form
     
@@ -52,6 +52,18 @@ module PluginJob
 
       @central.setLayout(@central_layout)
       self.setCentralWidget(@central)
+
+      self.connect(SIGNAL :notify_errors) do
+        show_errors
+      end
+
+      self.connect(SIGNAL :notify_warnings) do
+        show_warnings
+      end
+
+      self.connect(SIGNAL :notify_success) do
+        show_success
+      end
     end
 
     def populate_command_options(commands)
@@ -59,9 +71,16 @@ module PluginJob
     end
 
     def attach_log_listeners(log)
-      @log_all = QtPlainTextOutputter.new("Worker", :widget => @log_page.text_area)
-      @log_error = QtPlainTextOutputter.new("Worker", :widget => @error_page.text_area)
+      @log_all = EmitterOutputter.new("Worker")
+      @log_all.emitter.connect(SIGNAL("log(QString)")) do |data|
+        @log_page.text_area.appendPlainText(data)
+      end
+      
+      @log_error = EmitterOutputter.new("Worker")
       @log_error.only_at WARN, ERROR, FATAL
+      @log_error.emitter.connect(SIGNAL("log(QString)")) do |data|
+        @error_page.text_area.appendPlainText(data)
+      end
 
       log.add(@log_all)
       log.add(@log_error)
@@ -72,15 +91,15 @@ module PluginJob
       super
     end # closeEvent
 
-    def notify_errors
+    def show_errors
       @statusbar.setStyleSheet("QStatusBar {background: red}")
     end
 
-    def notify_warnings
+    def show_warnings
       @statusbar.setStyleSheet("QStatusBar {background: yellow}")
     end
 
-    def notify_success
+    def show_success
       @statusbar.setStyleSheet("QStatusBar {background: green}")      
     end
     
