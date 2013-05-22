@@ -91,11 +91,7 @@ module PluginJob
     end
 
     def attach_widget(w)
-      # @job_ui_layout = Qt::VBoxLayout.new
       @job_ui_layout.addWidget(w)
-      # @job_ui.setLayout(@job_ui_layout)
-      # may need to use w.setParent(@job_ui) ? 
-      puts "setting widget"
     end
 
     def closeEvent(event)

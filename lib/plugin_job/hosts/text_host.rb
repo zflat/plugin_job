@@ -29,7 +29,7 @@ module PluginJob
       }
 
       self.connect(SIGNAL :setup_complete) { after_setup }
-      # self.connect(SIGNAL :run_complete) { after_run }
+      self.connect(SIGNAL :run_complete) { after_run }
 
     end # initialize
 
