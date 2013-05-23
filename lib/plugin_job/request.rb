@@ -21,19 +21,31 @@ module PluginJob
     end # initialize
 
     def setup
-      @job = plugins[@command].new(@controller.host)
-      @job.setup
-      
-      # Signal setup complete
-      @controller.host.setup_complete
+      begin
+        @job = plugins[@command].new(@controller.host)
+        @job.setup
+      rescue
+        connected_log.error I18n.translate('plugin_job.host.error', :message => $!)
+      ensure
+        # Signal setup complete
+        @controller.host.setup_complete
+      end
     end
 
     def run
-      @job.run
-      @job.log.info I18n.translate('plugin_job.host.completed')
+      begin
+        @job.run
+        connected_log.info I18n.translate('plugin_job.host.completed')
+      rescue
+        connected_log.error I18n.translate('plugin_job.host.error', :message => $!)
+      ensure
+        # Signal run complete
+        @controller.host.run_complete
+      end
+    end
 
-      # Signal run complete
-      @controller.host.run_complete
+    def connected_log
+      (@job.nil? || @job.log.nil?) ? log : @job.log
     end
 
   end # class Request

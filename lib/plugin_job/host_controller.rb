@@ -47,9 +47,9 @@ module PluginJob
         # Controller > Request > Host > Worker
         
         if @plugins.has_command?(arg) || arg == ""
-
-          job_started
           @host.next_job = Request.new(arg, self, connection)
+          
+          job_started
           @host.launch(arg)
           
           # Block until job is finished
@@ -60,12 +60,16 @@ module PluginJob
           }
           @job_wait.join
         else
-          @host.log.warn I18n.translate('plugin_job.host.unknown_command', :command => arg)
+          connected_log.warn I18n.translate('plugin_job.host.unknown_command', :command => arg)
         end
       rescue
-        log.error I18n.translate('plugin_job.host.error', :message => $!)
+        connected_log.error I18n.translate('plugin_job.host.error', :message => $!)
       end
       @host.send_prompt
+    end
+
+    def connected_log
+      (@host.log.nil?) ? log : @host.log
     end
 
   end # class HostController
