@@ -21,11 +21,12 @@ end
 module MyJobs
   class Sleepy < PluginJob::Worker
     def run
+      log.warn("starting to count")
       (1..25).to_a.each do |i|
         log.info("..#{i}..")
         sleep 0.1
       end
-      log.warn("Nothing usefull accomplished.")
+      log.error("Nothing usefull accomplished.")
     end
   end
   

@@ -18,9 +18,19 @@ module PluginJob
         @err_watch = FlagOutputter.new("errors warnings fatal")
         @err_watch.only_at ERROR, FATAL
         log.add(@err_watch)
+        @err_watch.emitter.connect(SIGNAL :flag){
+          notify_errors
+        }          
+
         @warn_watch = FlagOutputter.new("errors warnings fatal")
         @warn_watch.only_at WARN
         log.add(@warn_watch)
+        @warn_watch.emitter.connect(SIGNAL :flag){
+          unless @err_watch.flag
+            @window.notify_warnings
+          end
+        }
+
 
         @window.connect(SIGNAL :close_sig){
           self.kill
