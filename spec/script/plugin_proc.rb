@@ -34,8 +34,8 @@ module MyJobs
       log.info "Printing output text"
     end
 
-    def silent?
-      true
+    def meta
+      {:silent => true}.merge(super)
     end
   end
 

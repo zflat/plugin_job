@@ -19,8 +19,8 @@ module PluginJob
     def run
     end
 
-    def silent?
-      false
+    def meta
+      {}
     end
 
   end

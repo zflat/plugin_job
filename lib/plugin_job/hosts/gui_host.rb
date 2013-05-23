@@ -47,7 +47,7 @@ module PluginJob
 
     def after_setup
       # hide window if necessary
-      if @request.job.silent?
+      if @request.job.meta[:silent]
         @window.showMinimized
       end
 
@@ -61,7 +61,7 @@ module PluginJob
 
     def after_run
 
-      end_silent = @request.job.silent? && !@err_watch.flag
+      end_silent = @request.job.meta[:silent] && !@err_watch.flag
 
       if @err_watch.flag
         notify_errors
