@@ -27,8 +27,10 @@ module PluginJob
       rescue
         connected_log.error I18n.translate('plugin_job.host.error', :message => $!)
       ensure
-        # Signal setup complete
-        @controller.host.setup_complete
+        # Signal setup complete unless the job was killed
+        unless @controller.host.job_cleared?
+          @controller.host.setup_complete
+        end
       end
     end
 
@@ -39,8 +41,10 @@ module PluginJob
       rescue
         connected_log.error I18n.translate('plugin_job.host.error', :message => $!)
       ensure
-        # Signal run complete
-        @controller.host.run_complete
+        # Signal run complete unless the job was killed
+        unless @controller.host.job_cleared?        
+          @controller.host.run_complete
+        end
       end
     end
 

@@ -1,4 +1,5 @@
 require "plugin_job/hosts/widgets/log_text"
+require "plugin_job/hosts/widgets/about_dialog"
 require "plugin_job/hosts/widgets/job_selection_form"
 require "plugin_job/outputters/emitter_outputter"
 require "Qt"
@@ -15,6 +16,70 @@ module PluginJob
       super
       self.setWindowTitle(I18n.translate('plugin_job.launcher.title'))
 
+      # See http://usefulfor.com/ruby/2007/07/31/ruby-qt-menu-bar-status-bar-and-resources/
+      @menubar = Qt::MenuBar.new(self)
+      @menubar.setObjectName('menubar')
+      # Top level menu items
+      @menuFile = Qt::Menu.new(@menubar)
+      @menuFile.setObjectName('menufile')
+      @menuFile.setTitle(I18n.translate('plugin_job.widget.select_launcher.menu.file'))
+      
+      @menuHelp = Qt::Menu.new(@menubar)
+      @menuHelp.setObjectName('menuHelp')
+      @menuHelp.setTitle(I18n.translate('plugin_job.widget.select_launcher.menu.help'))
+      
+      # add the top level menu items to the menu bar
+      @menubar.addAction(@menuFile.menuAction())
+      @menubar.addAction(@menuHelp.menuAction())
+
+      self.setMenuBar(@menubar)
+
+      # create menu actions
+      @actionSaveLog = Qt::Action.new(self)
+      @actionSaveLog.setObjectName('actionSaveLog')
+      tr_key = 'plugin_job.widget.select_launcher.menu.save_log'
+      @actionSaveLog.setText(I18n.translate(tr_key))
+      @actionSaveLog.connect(SIGNAL :triggered){
+        @log_page.save_to_file(self,
+                               I18n.translate(tr_key), 
+                               File.join(Dir.home,
+                                         "#{Time.now.strftime('%Y%m%d%H%M%S')}_log.txt"),
+                               "Log files (*.txt, *.log)")
+      }
+      @menuFile.addAction(@actionSaveLog)
+
+      @actionSaveErr = Qt::Action.new(self)
+      @actionSaveErr.setObjectName('actionSaveErr')
+      tr_key = 'plugin_job.widget.select_launcher.menu.save_errors'
+      @actionSaveErr.setText(I18n.translate(tr_key))
+      @actionSaveErr.connect(SIGNAL :triggered){
+        @error_page.save_to_file(self,
+                                 I18n.translate(tr_key), 
+                                 File.join(Dir.home, 
+                                           "#{Time.now.strftime('%Y%m%d%H%M%S')}_errors_warnings_log.txt"),
+                                 "Log files (*.txt, *.log)")
+      }
+      @menuFile.addAction(@actionSaveErr)
+      @menuFile.addSeparator()
+
+      @actionExit = Qt::Action.new(self)
+      @actionExit.setObjectName('actionExit')
+      @actionExit.setText('Exit')
+      @actionExit.connect(SIGNAL :triggered){
+        self.close
+      }
+      @menuFile.addAction(@actionExit)
+
+      @actionAbout = Qt::Action.new(self)
+      @actionAbout.setObjectName('actionAbout')
+      @actionAbout.setText(I18n.translate('plugin_job.widget.select_launcher.menu.about'))
+      @actionAbout.connect(SIGNAL :triggered){
+        dialog = AboutDialog.new(self)
+        dialog.exec
+      }
+      @menuHelp.addAction(@actionAbout)
+      
+      
       # create and attach the status bar
       @statusbar = Qt::StatusBar.new(self)
       @statusbar.setObjectName('statusbar')
@@ -38,7 +103,6 @@ module PluginJob
       # @job_ui_layout.addWidget(w)
       @job_ui.setLayout(@job_ui_layout)
 
-      
       # create the tabs
       @tabs = Qt::TabWidget.new
       @log_page = LogText.new

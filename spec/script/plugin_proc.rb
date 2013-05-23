@@ -79,15 +79,18 @@ require "plugin_job/outputters/host_echo"
 class EchoHost < PluginJob::GuiHost
   include PluginJob::HostEcho
 
-  def send_prompt
-    if @connection
-      @connection.send_data "#> "
+  def send_prompt(connection=nil)
+    c = @connection || connection
+    if c
+      c.send_data "#> "
     end
   end
 
   def block(command)
     super
-    log.warn I18n.translate('plugin_job.host.block', :command => command)
+    if log
+      log.warn I18n.translate('plugin_job.host.block', :command => command)
+    end
   end
 end
 

@@ -74,7 +74,6 @@ module PluginJob
     end
 
     def end_job
-      send_prompt
       clear_job
       emit complete
     end
@@ -84,7 +83,11 @@ module PluginJob
       send_prompt
     end
 
-    def send_prompt
+    def send_prompt(connection=nil)
+    end
+
+    def job_cleared?
+      @request.nil?
     end
 
     private

@@ -24,5 +24,12 @@ module PluginJob
       self.resize(200, 200)      
       @text_area = self
     end
+
+    def save_to_file(*dialog_args)
+      fname = Qt::FileDialog::getSaveFileName(*dialog_args)
+      unless fname.nil?
+        File.open(fname, 'w'){|f| f.write(text_area.plainText)}
+      end
+    end
   end
 end

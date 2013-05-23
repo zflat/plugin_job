@@ -17,7 +17,17 @@ en:
       :select_label: "Job"
       :select_btn: "Run"
     widget:
+      :about:
+        :lib_name: "Launcher application for running plugin jobs"
+        :lib_version: "\tPlugin launcher version: %{version}"
+        :ruby_version: "\tRuby runtime version: %{version}p%{patch} %{platform}"
       :select_launcher:
+        :menu:
+          :file: "File"
+          :save_log: "Save Log"
+          :save_errors: "Save Errors/Warnigs Log"
+          :help: "&Help"
+          :about: "About"
         :tab:
           :log: "Log"
           :error: "Errors/Warnings"
