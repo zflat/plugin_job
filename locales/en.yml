@@ -18,6 +18,7 @@ en:
       :select_btn: "Run"
     widget:
       :about:
+        :title: "About"
         :lib_name: "Launcher application for running plugin jobs"
         :lib_version: "\tPlugin launcher version: %{version}"
         :ruby_version: "\tRuby runtime version: %{version}p%{patch} %{platform}"

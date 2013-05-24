@@ -6,6 +6,8 @@ module PluginJob
     
     def initialize(parent=nil, flags = 0)
       super
+      self.setWindowTitle(I18n.translate('plugin_job.widget.about.title'))
+
       @lib_name = 
         Qt::Label.new(I18n.translate('plugin_job.widget.about.lib_name'))
       @lib_version = 
