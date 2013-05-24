@@ -45,15 +45,18 @@ module PluginJob
     def queue_request
       proc {
         if block.try_lock
-          
-          # TODO: wrap in begin rescue to make sure lock is unlocked
-          if command.downcase == "exit"
-            EM::stop
-          else
-            dispatch_job command
+          begin
+            if command.downcase == "exit"
+              EM::stop
+            else
+              dispatch_job command
+            end
+          rescue
+            @host_controller.log
+              .error I18n.translate('plugin_job.host.error', :message => $!)
+          ensure
+            block.unlock
           end
-          
-          block.unlock
         else # lock.try_lock
           notify_block
         end # lock.try_lock
@@ -87,7 +90,12 @@ module PluginJob
       EM::run do
         self.start
         EM.add_periodic_timer(0.01) do
-          @app.process_events
+          begin
+            @app.process_events
+          rescue
+            @host_controller.log
+              .fatal I18n.translate('plugin_job.host.error', :message => $!)
+          end
         end
       end
     end
