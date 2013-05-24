@@ -11,7 +11,7 @@ module PluginJob
       if @window.nil?
         @window = SelectLauncher.new
         @window.resize(600, 400)
-        @window.attach_log_listeners(log)
+        @window.attach_log_listeners(log, @request.computer_context_info)
         @window.populate_command_options(plugins.command_list)
 
         # watch for errors and warnings

@@ -138,15 +138,20 @@ module PluginJob
       @select_form.populate_command_options(commands)
     end
 
-    def attach_log_listeners(log)
+    def attach_log_listeners(log, header)
+      @log_header_text = header
       @log_all = EmitterOutputter.new("Worker")
       @log_all.emitter.connect(SIGNAL("log(QString)")) do |data|
-        @log_page.text_area.appendPlainText(data)
+        @log_page.text_area.appendPlainText(data[0..-2])
       end
       
       @log_error = EmitterOutputter.new("Worker")
       @log_error.only_at WARN, ERROR, FATAL
       @log_error.emitter.connect(SIGNAL("log(QString)")) do |data|
+        if @error_page.text_area.plainText.length < 1
+          @error_page.text_area.appendPlainText(@log_header_text)
+        end
+
         @error_page.text_area.appendPlainText(data)
       end
 

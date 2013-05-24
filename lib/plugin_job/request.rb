@@ -52,6 +52,14 @@ module PluginJob
       (@job.nil? || @job.log.nil?) ? log : @job.log
     end
 
+    def computer_context_info
+      # Get computer name info
+      # http://www.codeproject.com/Articles/7088/How-to-Get-Windows-Directory-Computer-Name-and-Sys
+      # http://newsgroups.derkeiler.com/Archive/Comp/comp.lang.ruby/2008-04/msg01780.html
+      # http://www.ruby-forum.com/topic/152169
+      "#{command} #{Time.now} #{Socket.gethostname} #{ENV['USERNAME']}"
+    end
+
   end # class Request
 
 end # module PluginJob

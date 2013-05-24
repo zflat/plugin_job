@@ -52,12 +52,8 @@ module PluginJob
     end
 
     def after_setup
-      # Get computer name info
-      # http://www.codeproject.com/Articles/7088/How-to-Get-Windows-Directory-Computer-Name-and-Sys
-      # http://newsgroups.derkeiler.com/Archive/Comp/comp.lang.ruby/2008-04/msg01780.html
-      # http://www.ruby-forum.com/topic/152169
-      log.info "#{command} #{Time.now} #{Socket.gethostname} #{ENV['USERNAME']}"
-      
+      log.info @request.computer_context_info
+
       # Execute the Run step asynchronisly
       @steps[:run] = Thread.new {@request.run}
     end
