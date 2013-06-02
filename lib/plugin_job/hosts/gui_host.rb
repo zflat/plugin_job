@@ -87,11 +87,12 @@ module PluginJob
         super
       else
         # Block in the background until window is closed
-        log.info I18n.translate('plugin_job.host.window_close_wait')
+        @window_close_wait = true
         Thread.new{
           while( ! @window_closed )
             sleep 0.1
           end
+          @window_close_wait = false
           super
         }
       end # if end_silent
@@ -115,11 +116,18 @@ module PluginJob
     end
 
     def block(command)
+      if @window_close_wait
+        log.info I18n.translate('plugin_job.host.window_close_wait')
+      end
       show_window
     end
 
     def clear_job
       super
+      # Ensure the window is closed and disposed
+      if @window
+        @window.close
+      end
       @window = nil
     end
 
