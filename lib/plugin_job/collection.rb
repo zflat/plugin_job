@@ -1,12 +1,12 @@
 module PluginJob
   class Collection
-    attr_reader :map
+    attr_reader :map, :scope
 
     #
     # @param Hash map where each key is a category 
     # and each value is an array representing the list
     # of plugins in the category
-    def initialize(map, scope=Object)
+    def initialize(map, scope)
       @map = map
       @scope = scope
     end

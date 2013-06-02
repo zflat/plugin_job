@@ -41,6 +41,17 @@ module PluginJob
       }
     end
 
+    def run_update(connection)
+      @plugins.scope.instance_eval do
+        class << self
+          require 'bundler/cli'
+          Bundler::CLI.start(['install'])
+        end
+      end # instance_eval
+      
+      @host.send_prompt(connection)
+    end
+
     def run_job(arg, connection)
       begin
         # Make sure the logs inherit in the right order
