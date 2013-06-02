@@ -1,6 +1,7 @@
 require "plugin_job/outputters/host_echo"
 require "Qt"
 require "socket"
+require "stringio"
 
 module PluginJob
 
@@ -36,7 +37,15 @@ module PluginJob
 
     def run
       begin
-        @job.run
+        temp_stream = StringIO.new
+        begin
+          out_stream = $stdout
+          $stdout = temp_stream
+          @job.run
+        ensure
+          $stdout = out_stream
+        end
+        connected_log.debug temp_stream.string
         connected_log.info I18n.translate('plugin_job.host.completed')
       rescue
         connected_log.error I18n.translate('plugin_job.host.error', :message => $!)
