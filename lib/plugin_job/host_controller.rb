@@ -42,13 +42,12 @@ module PluginJob
     end
 
     def run_update(connection)
+      require 'plugin_job/updater'
       @plugins.scope.instance_eval do
         class << self
-          require 'bundler/cli'
-          Bundler::CLI.start(['install'])
-        end
+          Updater::update
+        end # class << self
       end # instance_eval
-      
       @host.send_prompt(connection)
     end
 

@@ -48,7 +48,7 @@ module PluginJob
           begin
             if command.downcase == "exit"
               EM::stop
-            elsif command.downcase == "update"
+            elsif command == "update"
               @host_controller.run_update(self)
             else
               dispatch_job command

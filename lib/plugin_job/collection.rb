@@ -1,3 +1,5 @@
+require 'plugin_job/updater'
+
 module PluginJob
   class Collection
     attr_reader :map, :scope
@@ -9,10 +11,15 @@ module PluginJob
     def initialize(map, scope)
       @map = map
       @scope = scope
+
+      cmd_set = update_cmd
+      @scope.instance_eval do
+        const_set(cmd_set, Updater::UpdateJob)
+      end
     end
 
     def command_list
-      map.values.flatten.map{ |c| c.to_s }
+      map.values.flatten.map{ |c| c.to_s } + [update_cmd]
     end
 
     def categories
@@ -25,6 +32,12 @@ module PluginJob
 
     def has_command?(command)
       command_list.include?(command.to_s)
+    end
+
+    private
+
+    def update_cmd
+      "UpdatePlugins"
     end
     
   end
