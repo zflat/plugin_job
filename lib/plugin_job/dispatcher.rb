@@ -89,7 +89,7 @@ module PluginJob
       @app = Qt::Application.new(ARGV)
       EM::run do
         self.start
-        EM.add_periodic_timer(0.01) do
+        EM.add_periodic_timer(0.05) do
           begin
             @app.process_events
           rescue
