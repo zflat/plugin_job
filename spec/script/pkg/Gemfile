@@ -1,0 +1,5 @@
+source "https://rubygems.org"
+
+plugin_job_path = File.join(File.expand_path(__FILE__), '..','..','..','..')
+gem "plugin_job", :path => plugin_job_path
+
