@@ -41,16 +41,6 @@ module PluginJob
       }
     end
 
-    def run_update(connection)
-      require 'plugin_job/updater'
-      @plugins.scope.instance_eval do
-        class << self
-          Updater::update
-        end # class << self
-      end # instance_eval
-      @host.send_prompt(connection)
-    end
-
     def run_job(arg, connection)
       begin
         # Make sure the logs inherit in the right order
@@ -81,6 +71,7 @@ module PluginJob
       end
     end
 
+    private
     def connected_log(connection)
       if @host && @host.log
         l = @host.log

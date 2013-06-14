@@ -8,17 +8,26 @@ localhost = nil
 while !localhost
   begin
     localhost = Net::Telnet::new("Host" => "localhost",
-                               "Timeout" => 10000,
+                               "Timeout" => false,
                                "Port" => 3333,
                                "Telnetmode" => false)
   rescue
   end
 end
 
+watcher = Thread.new {
+  begin
+    localhost.waitfor("FailEOF" => true)
+  rescue
+    puts "\nConnection closed."
+    localhost.close
+    exit 0
+  end
+}
+
 print "#> "
 cmd = ""
-while cmd != 'exit'
-  
+while cmd
   input = STDIN.gets
   if input
     cmd = input.chomp
@@ -29,4 +38,4 @@ while cmd != 'exit'
   end
 end
 
-localhost.close
+

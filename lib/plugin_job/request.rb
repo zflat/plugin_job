@@ -38,6 +38,7 @@ module PluginJob
     def run
       begin
         temp_stream = StringIO.new
+        shall_terminate = false
         begin
           out_stream = $stdout
           $stdout = temp_stream
@@ -51,7 +52,7 @@ module PluginJob
         connected_log.error I18n.translate('plugin_job.host.error', :message => $!)
       ensure
         # Signal run complete unless the job was killed
-        unless @controller.host.job_cleared?        
+        unless @controller.host.job_cleared?
           @controller.host.run_complete
         end
       end

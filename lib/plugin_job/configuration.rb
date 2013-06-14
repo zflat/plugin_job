@@ -3,12 +3,13 @@ module PluginJob
   # Allow for configuration in the host application
   # See http://robots.thoughtbot.com/post/344833329/mygem-configure-block
   class Configuration
-    attr_accessor :port, :host_ip
+    attr_accessor :port, :host_ip, :base_gem, :gemfile_path
       
     def initialize
       @port = 3333
       @host_ip = "127.0.0.1"
-      @output_path = './output.pdf'
+      @base_gem = "plugin_job"
+      @gemfile_path = ""
     end
   end # class Configuration
   

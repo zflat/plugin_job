@@ -48,8 +48,6 @@ module PluginJob
           begin
             if command.downcase == "exit"
               EM::stop
-            elsif command == "update"
-              @host_controller.run_update(self)
             else
               dispatch_job command
             end
@@ -58,6 +56,10 @@ module PluginJob
               .error I18n.translate('plugin_job.host.error', :message => $!)
           ensure
             block.unlock
+            cmd = @host_controller.host.command
+            if cmd && cmd.downcase == "updateplugins"
+              EM::stop
+            end
           end
         else # lock.try_lock
           notify_block

@@ -8,7 +8,12 @@ require 'bundler/setup'
 require 'plugin_job'
 require 'plugin_job/hosts/text_host'
 
-module Pkg
+module Pkg; end  # Intentionally empty
+
+# configuration
+PluginJob.configure do |config|
+  config.base_gem = "plugin_job"
+  config.gemfile_path = File.join(File.dirname(__FILE__), 'Gemfile')
 end
 
 require "log4r"

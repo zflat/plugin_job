@@ -7,6 +7,11 @@ require 'bundler/setup'
 
 require 'plugin_job'
 
+# configuration
+PluginJob.configure do |config|
+  config.base_gem = "plugin_job"
+end
+
 ################
 # Set up the Log
 require "log4r"

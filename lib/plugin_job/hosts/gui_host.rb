@@ -31,7 +31,6 @@ module PluginJob
           end
         }
 
-
         @window.connect(SIGNAL :close_sig){
           self.kill
           @window_closed = true

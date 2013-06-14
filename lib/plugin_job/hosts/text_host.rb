@@ -34,7 +34,7 @@ module PluginJob
     end # initialize
 
     def command
-      @request.command
+      @request.command if @request
     end
 
     def plugins
@@ -70,7 +70,7 @@ module PluginJob
     end
 
     def end_job
-      clear_job
+      # clear_job
       emit complete
     end
 
