@@ -103,4 +103,8 @@ server = PluginJob::Dispatcher.new(controller, server_config)
 
 #####################
 # Run the application
-server.exec_app
+begin
+  server.exec_app
+rescue 
+  puts "Server not running in this process"
+end
