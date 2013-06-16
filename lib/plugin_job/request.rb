@@ -36,27 +36,31 @@ module PluginJob
     end
 
     def run
-      begin
-        temp_stream = StringIO.new
-        shall_terminate = false
+      if (@passed_validation = @job.valid?)
         begin
-          out_stream = $stdout
-          $stdout = temp_stream
-          @job.run
+          temp_stream = StringIO.new
+          begin
+            out_stream = $stdout
+            $stdout = temp_stream
+            @job.run
+          ensure
+            $stdout = out_stream
+          end
+          connected_log.debug temp_stream.string if temp_stream.string.strip.length > 0
+          connected_log.info I18n.translate('plugin_job.host.completed')
+        rescue
+          connected_log.error I18n.translate('plugin_job.host.error', :message => $!)
         ensure
-          $stdout = out_stream
-        end
-        connected_log.debug temp_stream.string if temp_stream.string.strip.length > 0
-        connected_log.info I18n.translate('plugin_job.host.completed')
-      rescue
-        connected_log.error I18n.translate('plugin_job.host.error', :message => $!)
-      ensure
-        # Signal run complete unless the job was killed
-        unless @controller.host.job_cleared?
+          # Signal run complete unless the job was killed
+          unless @controller.host.job_cleared?
+            @controller.host.run_complete
+          end
+        end # begin, rescue
+      else
+          connected_log.warn I18n.translate('plugin_job.host.invalid')
           @controller.host.run_complete
-        end
-      end
-    end
+      end # job.valid?
+    end # run
 
     def connected_log
       (@job.nil? || @job.log.nil?) ? log : @job.log
@@ -68,6 +72,10 @@ module PluginJob
       # http://newsgroups.derkeiler.com/Archive/Comp/comp.lang.ruby/2008-04/msg01780.html
       # http://www.ruby-forum.com/topic/152169
       "#{command} #{Time.now} #{Socket.gethostname} #{ENV['USERNAME']}"
+    end
+
+    def passed_validation?
+      @passed_validation
     end
 
   end # class Request

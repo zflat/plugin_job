@@ -31,9 +31,13 @@ while cmd
   input = STDIN.gets
   if input
     cmd = input.chomp
-    localhost.cmd({"String" => cmd,
-                "Match" => Regexp.new("#> ")}) do |c|
-      print "#{c}"
+    begin
+      localhost.cmd({"String" => cmd,
+                      "Match" => Regexp.new("#> ")}) do |c|
+        print "#{c}"
+      end
+    rescue
+      exit 1
     end
   end
 end

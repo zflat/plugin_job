@@ -40,6 +40,10 @@ module PluginJob
     def plugins
       @request.plugins
     end
+
+    def valid_job?
+      @request.passed_validation?
+    end
     
     def process_request(arg)
       if arg != ""
@@ -70,7 +74,6 @@ module PluginJob
     end
 
     def end_job
-      # clear_job
       emit complete
     end
 

@@ -4,12 +4,15 @@ en:
       :connected: Connection established
       :disconnected: Connection closed
       :started: "Listening on %{port}"
+    update:
+      :not_needed: "No updated needed."
+      :started: "No updated needed."
     host:
       :command: "Command '%{command}'"
       :completed: "Completed"
       :unknown_command: "Command '%{command}' not recognized"
       :error: "An error occurred: %{message}"
-      :invalid: "The job could not run due to invalid conditions."
+      :invalid: "Job not run due to invalid conditions."
       :block: "Request '%{command}' blocked by current job."
       :window_close_wait: "Waiting for window to close."
     launcher:

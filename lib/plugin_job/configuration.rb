@@ -11,6 +11,14 @@ module PluginJob
       @base_gem = "plugin_job"
       @gemfile_path = ""
     end
+
+    def after_update(&block)
+      if block
+        @after_update_proc = block
+      elsif @after_update_proc
+        @after_update_proc.call
+      end
+    end
   end # class Configuration
   
   class << self

@@ -7,11 +7,6 @@ require 'bundler/setup'
 
 require 'plugin_job'
 
-# configuration
-PluginJob.configure do |config|
-  config.base_gem = "plugin_job"
-end
-
 ################
 # Set up the Log
 require "log4r"
@@ -105,6 +100,17 @@ controller = PluginJob::HostController.new(EchoHost, plugins, log)
 # Set up the server
 server_config = {"host_ip" => "localhost", "port" => 3333}
 server = PluginJob::Dispatcher.new(controller, server_config)
+
+
+###############
+# Configuration
+PluginJob.configure do |config|
+  config.base_gem = "plugin_job"
+  config.after_update do
+    puts "TEST After update"
+    log.info "Update completed"
+  end
+end
 
 #####################
 # Run the application

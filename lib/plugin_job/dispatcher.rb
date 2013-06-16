@@ -55,10 +55,12 @@ module PluginJob
             @host_controller.log
               .error I18n.translate('plugin_job.host.error', :message => $!)
           ensure
-            block.unlock
             cmd = @host_controller.host.command
-            if cmd && cmd.downcase == "updateplugins"
+            if cmd && cmd.downcase == "updateplugins" && 
+                @host_controller.host.valid_job?
               EM::stop
+            else
+              block.unlock
             end
           end
         else # lock.try_lock
