@@ -146,7 +146,7 @@ module PluginJob
       end
       
       @log_error = EmitterOutputter.new("Worker")
-      @log_error.only_at WARN, ERROR, FATAL
+      @log_error.only_at WARN, ERROR, FATAL, DEBUG
       @log_error.emitter.connect(SIGNAL("log(QString)")) do |data|
         if @error_page.text_area.plainText.length < 1
           @error_page.text_area.appendPlainText(@log_header_text)

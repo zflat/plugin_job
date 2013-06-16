@@ -12,6 +12,7 @@ en:
       :completed: "Completed"
       :unknown_command: "Command '%{command}' not recognized"
       :error: "An error occurred: %{message}"
+      :backtrace: "Exception backtrace\r\n%{trace}"
       :invalid: "Job not run due to invalid conditions."
       :block: "Request '%{command}' blocked by current job."
       :window_close_wait: "Waiting for window to close."

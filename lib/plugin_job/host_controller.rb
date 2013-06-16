@@ -63,9 +63,12 @@ module PluginJob
           connected_log(connection).
             warn I18n.translate('plugin_job.host.unknown_command', :command => arg)
         end
-      rescue
+      rescue => detail
         connected_log(connection)
-          .error I18n.translate('plugin_job.host.error', :message => $!)
+          .error I18n.translate('plugin_job.host.error', :message => detail)
+        connected_log(connection)
+          .debug I18n.translate('plugin_job.host.backtrace', 
+                                :trace =>  detail.backtrace.join("\r\n"))
       ensure
         @host.send_prompt(connection)
       end

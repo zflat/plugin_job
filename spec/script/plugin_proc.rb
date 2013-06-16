@@ -47,6 +47,14 @@ module MyJobs
     end
   end
 
+  class ErrorPrint < Print
+    def run
+      super
+      log.info "Runnin...print"
+      1/0
+    end
+  end
+
   class Hello < PluginJob::Worker
     class HelloWidget < Qt::Widget
       
@@ -68,6 +76,7 @@ plugins = PluginJob::Collection.new({'MainCategory' =>
                                       ['Sleepy', 
                                        'Hello', 
                                        'Print', 
+                                       'ErrorPrint', 
                                        'BadPrint']
                                     }, MyJobs)
 

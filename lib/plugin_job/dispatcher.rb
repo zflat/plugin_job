@@ -51,9 +51,12 @@ module PluginJob
             else
               dispatch_job command
             end
-          rescue
+          rescue => detail
             @host_controller.log
-              .error I18n.translate('plugin_job.host.error', :message => $!)
+              .error I18n.translate('plugin_job.host.error', :message => detail)
+            @host_controller.log
+              .debug I18n.translate('plugin_job.host.backtrace', 
+                                    :trace =>  detail.backtrace.join("\r\n"))
           ensure
             cmd = @host_controller.host.command
             if cmd && cmd.downcase == "updateplugins" && 

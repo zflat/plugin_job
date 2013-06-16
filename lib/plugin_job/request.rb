@@ -25,8 +25,11 @@ module PluginJob
       begin
         @job = plugins[@command].new(@controller.host)
         @job.setup
-      rescue
-        connected_log.error I18n.translate('plugin_job.host.error', :message => $!)
+      rescue => detail
+        connected_log.error I18n.translate('plugin_job.host.error', :message => detail)
+        connected_log
+          .debug I18n.translate('plugin_job.host.backtrace', 
+                                :trace =>  detail.backtrace.join("\r\n"))
       ensure
         # Signal setup complete unless the job was killed
         unless @controller.host.job_cleared?
@@ -48,8 +51,11 @@ module PluginJob
           end
           connected_log.debug temp_stream.string if temp_stream.string.strip.length > 0
           connected_log.info I18n.translate('plugin_job.host.completed')
-        rescue
-          connected_log.error I18n.translate('plugin_job.host.error', :message => $!)
+        rescue => detail
+          connected_log.error I18n.translate('plugin_job.host.error', :message => detail)
+          connected_log
+            .debug I18n.translate('plugin_job.host.backtrace', 
+                                  :trace =>  detail.backtrace.join("\r\n"))
         ensure
           # Signal run complete unless the job was killed
           unless @controller.host.job_cleared?
