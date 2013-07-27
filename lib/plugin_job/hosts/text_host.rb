@@ -31,6 +31,8 @@ module PluginJob
       self.connect(SIGNAL :setup_complete) { after_setup }
       self.connect(SIGNAL :run_complete) { after_run }
 
+      clear_job
+
     end # initialize
 
     def command
@@ -38,7 +40,7 @@ module PluginJob
     end
 
     def plugins
-      @request.plugins
+      @request.plugins if @request
     end
 
     def valid_job?
@@ -47,7 +49,6 @@ module PluginJob
     
     def process_request(arg)
       if arg != ""
-
         # Run the setup step asynchronisly
         @steps[:setup] = Thread.new {
           @request.setup
@@ -66,8 +67,7 @@ module PluginJob
       end_job
     end
 
-    def next_job=(request)
-      clear_job
+    def job=(request)
       @request = request
       @connection = request.connection
       init_log(request.log, "host")
@@ -89,13 +89,14 @@ module PluginJob
       @request.nil?
     end
 
-    private
-
     def clear_job
       @request = nil
       @connection = nil
       @log = nil
     end
+
+    private
+
 
     def setup_job
     end

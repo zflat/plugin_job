@@ -6,7 +6,7 @@ require "plugin_job/dispatcher"
 require "plugin_job/request"
 require "plugin_job/sig_launch"
 require "plugin_job/host_controller"
-require "plugin_job/collection"
+require "plugin_job/plugin_collection"
 
 require "plugin_job/version"
 

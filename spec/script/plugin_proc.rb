@@ -72,12 +72,12 @@ module MyJobs
     end
   end
 end
-plugins = PluginJob::Collection.new({'MainCategory' =>
+plugins = PluginJob::PluginCollection.new({'MainCategory' =>
                                       ['Sleepy', 
                                        'Hello', 
                                        'Print', 
                                        'ErrorPrint', 
-                                       'BadPrint']
+                                       'BadPrint','']
                                     }, MyJobs)
 
 #######################

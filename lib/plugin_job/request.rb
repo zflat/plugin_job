@@ -7,7 +7,7 @@ module PluginJob
 
   class Request
 
-    attr_reader :connection, :plugins, :job
+    attr_reader :connection, :plugins, :job, :pipeline_cmd
 
     attr_accessor :command
     
@@ -17,6 +17,7 @@ module PluginJob
       @command = command
       @controller = controller
       @connection = connection
+      @pipeline_cmd = nil
       @plugins = controller.plugins
       init_log(controller.log, "request")
     end # initialize
@@ -45,7 +46,7 @@ module PluginJob
           begin
             out_stream = $stdout
             $stdout = temp_stream
-            @job.run
+            @pipeline_cmd = @job.run
           ensure
             $stdout = out_stream
           end

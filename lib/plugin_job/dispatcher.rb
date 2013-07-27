@@ -27,11 +27,8 @@ module PluginJob
     def receive_data(requested_command)
       return if requested_command.nil?
       @command = requested_command.to_s.strip
-      if block.locked?
-        notify_block
-      else
-        EM.defer queue_request
-      end
+
+      EM.defer queue_request
     end # receive_data
     
     def unbind
@@ -45,30 +42,30 @@ module PluginJob
     def queue_request
       proc {
         if block.try_lock
-          begin
-            if command.downcase == "exit"
-              EM::stop
-            else
-              dispatch_job command
-            end
-          rescue => detail
-            @host_controller.log
-              .error I18n.translate('plugin_job.host.error', :message => detail)
-            @host_controller.log
-              .debug I18n.translate('plugin_job.host.backtrace', 
-                                    :trace =>  detail.backtrace.join("\r\n"))
-          ensure
-            cmd = @host_controller.host.command
-            if cmd && cmd.downcase == "updateplugins" && 
-                @host_controller.host.valid_job?
-              EM::stop
-            else
-              block.unlock
-            end
-          end
-        else # lock.try_lock
+
+          while(command)
+            begin
+              if command.downcase == "exit"
+                EM::stop
+              else
+                dispatch_job command
+              end
+            rescue => detail
+              @host_controller.log
+                .error I18n.translate('plugin_job.host.error', :message => detail)
+              @host_controller.log
+                .debug I18n.translate('plugin_job.host.backtrace', 
+                                      :trace =>  detail.backtrace.join("\r\n"))          
+            end # begin/rescue
+            sleep 0.05
+            @command = @host_controller.command
+          end # while command.present?
+          
+          block.unlock
+          @host_controller.host.send_prompt(self)
+        else # block.try_lock
           notify_block
-        end # lock.try_lock
+        end
       }
     end
 

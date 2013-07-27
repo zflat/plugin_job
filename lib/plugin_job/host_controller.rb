@@ -32,25 +32,35 @@ module PluginJob
     def job_finished
       @job_status_lock.synchronize {
         @complete = true
+        @command = @host.job.pipeline_cmd
+      }
+    end
+
+    def command
+      @job_status_lock.synchronize {
+        @command
       }
     end
 
     def job_started
       @job_status_lock.synchronize {
         @complete = false
+        @command = nil
       }
     end
 
     def run_job(arg, connection)
+      @command = arg
+
       begin
         # Make sure the logs inherit in the right order
         # Controller > Request > Host > Worker
 
-        if @plugins.has_command?(arg) || arg == ""
-          @host.next_job = Request.new(arg, self, connection)
+        if @plugins.has_command?(command)
+          @host.job = Request.new(command, self, connection)
           
           job_started
-          @host.launch(arg)
+          @host.launch(command)
           
           # Block until job is finished
           @job_wait = Thread.new {
@@ -62,6 +72,7 @@ module PluginJob
         else
           connected_log(connection).
             warn I18n.translate('plugin_job.host.unknown_command', :command => arg)
+          @command = nil
         end
       rescue => detail
         connected_log(connection)
@@ -69,10 +80,11 @@ module PluginJob
         connected_log(connection)
           .debug I18n.translate('plugin_job.host.backtrace', 
                                 :trace =>  detail.backtrace.join("\r\n"))
+        @command = nil
       ensure
-        @host.send_prompt(connection)
+        @host.clear_job
       end
-    end
+    end # run_job
 
     private
     def connected_log(connection)
@@ -82,7 +94,7 @@ module PluginJob
 
       if l.nil? && connection
         temp_host = host_scope.new
-        temp_host.next_job = Request.new('', self, connection)
+        temp_host.job = Request.new('', self, connection)
         l = temp_host.log
       end
       l ||= log
