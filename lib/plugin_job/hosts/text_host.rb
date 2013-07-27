@@ -16,16 +16,23 @@ module PluginJob
       # Hash containing execution steps
       @steps = {}
 
+      # Synchronize access to killing current job
+      @killable_state_lock = Mutex.new
+      killable_state_start
+
       self.connect(SIGNAL("launch(QString)")) { |arg|
         process_request(arg)
       }
 
       self.connect(SIGNAL :kill){
-        # end any running steps
-        @steps.each do |key, val|
-          Thread.kill(val)
+        if can_kill?
+          # end any running steps
+          @steps.each do |key, val|
+            Thread.kill(val)
+          end
+          killed
+          end_job "kill"
         end
-        end_job
       }
 
       self.connect(SIGNAL :setup_complete) { after_setup }
@@ -44,10 +51,46 @@ module PluginJob
     def valid_job?
       @request.passed_validation?
     end
+
+    def killed?
+      ret_val = nil
+      @killable_state_lock.synchronize{
+        ret_val =  @killed
+      }
+      ret_val
+    end
+
+    def killed
+      @killable_state_lock.synchronize{
+        @killed = true
+      }
+    end
+
+    def can_kill?
+      killable = nil
+      @killable_state_lock.synchronize{
+        killable = @active_state
+      }
+      killable
+    end
+    
+    def killable_state_start
+      @killable_state_lock.synchronize{
+        @active_state = true
+      }
+    end
+
+    def killable_state_end
+      @killable_state_lock.synchronize{
+        @active_state = false
+      }
+    end
     
     def process_request(arg)
       if arg != ""
-
+        
+        killable_state_start
+        
         # Run the setup step asynchronisly
         @steps[:setup] = Thread.new {
           @request.setup
@@ -63,7 +106,10 @@ module PluginJob
     end
 
     def after_run
-      end_job
+      killable_state_end
+      unless killed?
+        end_job "after_run"
+      end
     end
 
     def next_job=(request)
@@ -71,10 +117,6 @@ module PluginJob
       @request = request
       @connection = request.connection
       init_log(request.log, "host")
-    end
-
-    def end_job
-      emit complete
     end
 
     def block(command)
@@ -98,6 +140,11 @@ module PluginJob
     end
 
     def setup_job
+    end
+
+    def end_job(state)
+      log.info "End job sent via #{state}"
+      emit complete
     end
 
   end # class TextHost

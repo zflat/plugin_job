@@ -18,7 +18,9 @@ module PluginJob
 
       @host_scope = host_scope
       @host = host_scope.new
-      @host.connect(SIGNAL :complete){ job_finished }
+      @host.connect(SIGNAL :complete){ 
+        job_finished 
+      }
     end
 
     def job_finished?
@@ -48,10 +50,10 @@ module PluginJob
 
         if @plugins.has_command?(arg) || arg == ""
           @host.next_job = Request.new(arg, self, connection)
-          
+
           job_started
           @host.launch(arg)
-          
+
           # Block until job is finished
           @job_wait = Thread.new {
             while ! job_finished?

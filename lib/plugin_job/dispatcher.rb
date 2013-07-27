@@ -9,7 +9,7 @@ module PluginJob
     attr_reader :command
     
     def initialize(host_controller, job_mutex, host_mutex)
-      # Use the mutext to ensure let a running job block
+      # Use the mutext to let a running job block
       @block = job_mutex
       
       # Use a mutex to make sure only one request is sent to the host at a time
@@ -28,6 +28,7 @@ module PluginJob
       return if requested_command.nil?
       @command = requested_command.to_s.strip
       if block.locked?
+        puts "blocked..."
         notify_block
       else
         EM.defer queue_request

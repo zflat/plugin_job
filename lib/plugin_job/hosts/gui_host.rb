@@ -44,6 +44,8 @@ module PluginJob
         if command != ""
           # Show current selection
           @window.select_form.select(command)
+        else
+          killable_state_start
         end
 
         show_window
@@ -57,7 +59,7 @@ module PluginJob
     def after_setup
       # hide window if necessary
       if @request.job.meta[:silent]
-        @window.showMinimized
+        hide_window
       end
 
       # add job widget to GUI if necessary
@@ -69,7 +71,7 @@ module PluginJob
     end
 
     def after_run
-
+      killable_state_end
       end_silent = @request.job.meta[:silent] && !@err_watch.flag
 
       if @err_watch.flag
@@ -92,6 +94,7 @@ module PluginJob
             sleep 0.1
           end
           @window_close_wait = false
+          dispose_window
           super
         }
       end # if end_silent
@@ -109,6 +112,12 @@ module PluginJob
       end
     end
 
+    def hide_window
+      unless @window.nil?
+        @window.showMinimized
+      end
+    end
+
     def notify_errors
       show_window
       @window.notify_errors
@@ -121,8 +130,16 @@ module PluginJob
       show_window
     end
 
+    private
+
     def clear_job
+      if can_kill?
+        dispose_window
+      end # can_kill?
       super
+    end
+
+    def dispose_window
       # Ensure the window is closed and disposed
       if @window
         @window.close
