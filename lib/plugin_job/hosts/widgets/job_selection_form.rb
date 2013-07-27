@@ -41,9 +41,11 @@ module PluginJob
       @index_map = {}
       i=0
       commands.each do |c|
-        @index_map[c.to_s] = i
-        i += 1
-        @box.addItem(c.to_s)
+        if c != ''
+          @index_map[c.to_s] = i
+          i += 1
+          @box.addItem(c.to_s)
+        end
       end
     end
 
