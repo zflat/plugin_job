@@ -61,7 +61,7 @@ module PluginJob
         if @plugins.has_command?(command)
           cmd = String.new(command)
           @host.job = Request.new(cmd, self, connection)
-          @host.log.debug("Command #{cmd}")
+          connected_log(connection).debug("Command #{cmd}")
 
           job_started
           @host.launch(cmd)

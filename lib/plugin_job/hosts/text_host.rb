@@ -65,7 +65,8 @@ module PluginJob
     end
 
     def after_run
-      @pipeline_cmd = @request.pipeline_cmd
+      @pipeline_cmd = nil
+      @pipelin_cmd = String.new(@request.pipeline_cmd) if @request.pipeline_cmd
       end_job
     end
 
@@ -76,6 +77,7 @@ module PluginJob
     end
 
     def end_job
+      log.debug "Emit completed"
       emit complete
     end
 

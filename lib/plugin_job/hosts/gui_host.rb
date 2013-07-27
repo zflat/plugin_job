@@ -69,7 +69,6 @@ module PluginJob
     end
 
     def after_run
-
       end_silent = @request.job.meta[:silent] && !@err_watch.flag
 
       if @err_watch.flag
@@ -95,7 +94,6 @@ module PluginJob
           super
         }
       end # if end_silent
-
     end # after_run
 
     def show_window

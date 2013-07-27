@@ -6,7 +6,7 @@ en:
       :started: "Listening on %{port}"
     update:
       :not_needed: "No updated needed."
-      :started: "No updated needed."
+      :started: "Updates in progress."
     host:
       :command: "Command '%{command}'"
       :completed: "Completed"

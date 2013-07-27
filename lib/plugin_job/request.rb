@@ -61,6 +61,7 @@ module PluginJob
         ensure
           # Signal run complete unless the job was killed
           unless @controller.host.job_cleared?
+            connected_log.debug("Signal run complete")
             @controller.host.run_complete
           end
         end # begin, rescue
@@ -69,6 +70,10 @@ module PluginJob
           @controller.host.run_complete
       end # job.valid?
     end # run
+
+    def meta
+      @job.meta
+    end
 
     def connected_log
       (@job.nil? || @job.log.nil?) ? log : @job.log
