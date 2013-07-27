@@ -40,6 +40,10 @@ module PluginJob
       def valid?
         @is_outdated
       end
+
+      def meta
+        {:pipeline_command => 'Exit'}.merge(super)
+      end
     end
 
   end
