@@ -42,7 +42,6 @@ module PluginJob
     def queue_request
       proc {
         if block.try_lock
-
           while(command)
             begin
               if command.downcase == "exit"
@@ -50,15 +49,16 @@ module PluginJob
               else
                 dispatch_job command
               end
+              sleep 0.05
+              @command = @host_controller.command && String.new(@host_controller.command)
             rescue => detail
               @host_controller.log
                 .error I18n.translate('plugin_job.host.error', :message => detail)
               @host_controller.log
                 .debug I18n.translate('plugin_job.host.backtrace', 
-                                      :trace =>  detail.backtrace.join("\r\n"))          
+                                      :trace =>  detail.backtrace.join("\r\n")) 
+              break
             end # begin/rescue
-            sleep 0.05
-            @command = @host_controller.command
           end # while command.present?
           
           block.unlock
@@ -98,9 +98,12 @@ module PluginJob
         EM.add_periodic_timer(0.05) do
           begin
             @app.process_events
-          rescue
+          rescue => detail
             @host_controller.log
               .fatal I18n.translate('plugin_job.host.error', :message => $!)
+            @host_controller.log.
+              debug I18n.translate('plugin_job.host.backtrace', 
+                                  :trace =>  detail.backtrace.join("\r\n"))
           end
         end
       end

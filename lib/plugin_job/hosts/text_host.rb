@@ -8,7 +8,7 @@ module PluginJob
 
     signals :complete, :kill, "launch(QString)", :setup_complete, :run_complete
 
-    attr_reader :plugins
+    attr_reader :plugins, :pipeline_cmd
     
     def initialize
       super
@@ -31,6 +31,7 @@ module PluginJob
       self.connect(SIGNAL :setup_complete) { after_setup }
       self.connect(SIGNAL :run_complete) { after_run }
 
+      @pipeline_cmd = nil
       clear_job
 
     end # initialize
@@ -64,6 +65,7 @@ module PluginJob
     end
 
     def after_run
+      @pipeline_cmd = @request.pipeline_cmd
       end_job
     end
 

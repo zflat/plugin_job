@@ -24,7 +24,7 @@ module PluginJob
 
     def setup
       begin
-        @job = plugins[@command].new(@controller.host)
+        @job = plugins[command].new(@controller.host)
         @job.setup
       rescue => detail
         connected_log.error I18n.translate('plugin_job.host.error', :message => detail)
@@ -46,7 +46,8 @@ module PluginJob
           begin
             out_stream = $stdout
             $stdout = temp_stream
-            @pipeline_cmd = @job.run
+            @job.run
+            @pipeline_cmd = @job.meta[:pipeline_command]
           ensure
             $stdout = out_stream
           end

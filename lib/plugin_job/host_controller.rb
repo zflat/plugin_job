@@ -32,14 +32,16 @@ module PluginJob
     def job_finished
       @job_status_lock.synchronize {
         @complete = true
-        @command = @host.job.pipeline_cmd
+        @command = @host.pipeline_cmd
       }
     end
 
     def command
+      cmd = nil
       @job_status_lock.synchronize {
-        @command
+        cmd = @command
       }
+      return cmd
     end
 
     def job_started
@@ -57,11 +59,13 @@ module PluginJob
         # Controller > Request > Host > Worker
 
         if @plugins.has_command?(command)
-          @host.job = Request.new(command, self, connection)
-          
+          cmd = String.new(command)
+          @host.job = Request.new(cmd, self, connection)
+          @host.log.debug("Command #{cmd}")
+
           job_started
-          @host.launch(command)
-          
+          @host.launch(cmd)
+
           # Block until job is finished
           @job_wait = Thread.new {
             while ! job_finished?
