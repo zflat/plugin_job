@@ -89,9 +89,10 @@ class EchoHost < PluginJob::GuiHost
   include PluginJob::HostEcho
 
   def send_prompt(connection=nil)
-    c = @connection || connection
+    # Given connection takes precedence over defaulted one
+    c = connection || @connection
     if c
-      c.send_data "#> "
+      r = c.send_data "#> "
     end
   end
 

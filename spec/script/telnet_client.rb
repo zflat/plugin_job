@@ -13,6 +13,7 @@ while !localhost
                                "Telnetmode" => false)
   rescue
   end
+  sleep 0.01
 end
 
 watcher = Thread.new {

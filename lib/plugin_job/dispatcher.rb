@@ -76,7 +76,7 @@ module PluginJob
 
     def notify_block
       host_sem.synchronize {
-        @host_controller.host.block command if @host_controller.host
+        @host_controller.host.block(command, self) if @host_controller.host
       }
     end
   end # class DispatchHandler

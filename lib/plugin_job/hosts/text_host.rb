@@ -83,9 +83,9 @@ module PluginJob
       emit complete
     end
 
-    def block(command)
+    def block(command, connection=nil)
       log.warn I18n.translate('plugin_job.host.block', :command => command)
-      send_prompt
+      send_prompt(connection)
     end
 
     def send_prompt(connection=nil)
