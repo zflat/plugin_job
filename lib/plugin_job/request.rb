@@ -2,6 +2,7 @@ require "plugin_job/outputters/host_echo"
 require "Qt"
 require "socket"
 require "stringio"
+require "state_machine"
 
 module PluginJob
 
@@ -13,6 +14,46 @@ module PluginJob
     
     include LogBuilder
 
+    state_machine :state, :initial => :new do 
+      
+      event :start_setup do
+        transition :new => :setting_up
+      end
+
+      event :setup_done do 
+        transition :setup => :run_ready
+      end
+
+      event :begin_run do
+        transition :run_ready => :running
+      end
+
+      event :kill do
+        transition [:new, :setting_up, :run_ready, :running] => :killed
+      end
+
+      event :complete_run do
+        transition :running => :run_completed
+      end
+
+      event :cleanup do
+        transition [:run_completed, :killed] => :cleaning
+      end
+
+      event :end_cleanup do
+        transition :cleaning => :cleaned
+      end
+
+      state :new
+      state :setting_up
+      state :run_ready
+      state :running
+      state :run_completed
+      state :cleaning
+      state :cleaned
+      state :killed
+    end # state_machine
+
     def initialize(command, controller, connection)
       @command = command
       @controller = controller
@@ -20,9 +61,11 @@ module PluginJob
       @pipeline_cmd = nil
       @plugins = controller.plugins
       init_log(controller.log, "request")
+      super() # to initialize the sate machine
     end # initialize
 
     def setup
+      # self.start_setup
       begin
         @job = plugins[command].new(@controller.host)
         @job.setup
@@ -37,9 +80,11 @@ module PluginJob
           @controller.host.setup_complete
         end
       end
-    end
+      self.setup_done
+    end # setup
 
     def run
+      self.begin_run
       if (@passed_validation = @job.valid?)
         begin
           temp_stream = StringIO.new
@@ -61,7 +106,6 @@ module PluginJob
         ensure
           # Signal run complete unless the job was killed
           unless @controller.host.job_cleared?
-            connected_log.debug("Signal run complete")
             @controller.host.run_complete
           end
         end # begin, rescue
@@ -69,6 +113,7 @@ module PluginJob
           connected_log.warn I18n.translate('plugin_job.host.invalid')
           @controller.host.run_complete
       end # job.valid?
+      self.complete_run
     end # run
 
     def meta

@@ -21,11 +21,14 @@ module PluginJob
       }
 
       self.connect(SIGNAL :kill){
-        # end any running steps
-        @steps.each do |key, val|
-          Thread.kill(val)
+        if @request.can_kill?
+          @request.kill
+          # end any running steps
+          @steps.each do |key, val|
+            Thread.kill(val)
+          end
+          end_job
         end
-        end_job
       }
 
       self.connect(SIGNAL :setup_complete) { after_setup }
@@ -66,7 +69,7 @@ module PluginJob
 
     def after_run
       @pipeline_cmd = nil
-      @pipelin_cmd = String.new(@request.pipeline_cmd) if @request.pipeline_cmd
+      @pipeline_cmd = String.new(@request.pipeline_cmd) if @request.pipeline_cmd
       end_job
     end
 
@@ -77,7 +80,6 @@ module PluginJob
     end
 
     def end_job
-      log.debug "Emit completed"
       emit complete
     end
 
@@ -93,14 +95,23 @@ module PluginJob
       @request.nil?
     end
 
-    def clear_job
-      @request = nil
-      @connection = nil
-      @log = nil
+    def cleanup_job
+      if @request.can_cleanup?
+        @request.cleanup
+        # TODO: make sure all log messages are sent before clearing
+        # the job objects
+        clear_job
+      end
     end
 
     private
 
+    def clear_job
+      @connection = nil
+      @log = nil
+      @request.end_cleanup unless @request.nil?
+      @request = nil
+    end
 
     def setup_job
     end

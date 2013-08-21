@@ -32,8 +32,10 @@ module PluginJob
         }
 
         @window.connect(SIGNAL :close_sig){
-          self.kill
-          @window_closed = true
+          if @request.can_kill?
+            self.kill
+            @window_closed = true
+          end
         }
 
         @window.select_form.connect(SIGNAL("command_selected(QString)")){ |arg|

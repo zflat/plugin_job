@@ -25,11 +25,13 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency(%q<childprocess>, [">= 0.3.9"])
   spec.add_development_dependency(%q<log4r>, ["~>1.1.10"])
   spec.add_development_dependency(%q<i18n>, ["~>0.6.4"])
+  spec.add_development_dependency(%q<state_machine>, ["~>1.2.0"])
   spec.add_development_dependency("qtbindings")
 
   spec.add_dependency "bundler", "~> 1.3"
   spec.add_dependency(%q<eventmachine>, [">= 1.0.3"])
   spec.add_dependency(%q<log4r>, ["~>1.1.10"])
   spec.add_dependency(%q<i18n>, ["~>0.6.4"])
+  spec.add_dependency(%q<state_machine>, ["~>1.2.0"])
   spec.add_dependency("qtbindings")
 end

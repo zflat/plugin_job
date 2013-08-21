@@ -62,6 +62,7 @@ module PluginJob
           end # while command.present?
           
           block.unlock
+          sleep 0.05
           @host_controller.host.send_prompt(self)
         else # block.try_lock
           notify_block

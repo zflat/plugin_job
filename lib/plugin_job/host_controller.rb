@@ -31,8 +31,9 @@ module PluginJob
 
     def job_finished
       @job_status_lock.synchronize {
-        @complete = true
+        @command = nil
         @command = @host.pipeline_cmd
+        @complete = true
       }
     end
 
@@ -44,6 +45,12 @@ module PluginJob
       return cmd
     end
 
+    def command=(arg)
+      @job_status_lock.synchronize {
+        @command = arg
+      }
+    end
+
     def job_started
       @job_status_lock.synchronize {
         @complete = false
@@ -52,7 +59,7 @@ module PluginJob
     end
 
     def run_job(arg, connection)
-      @command = arg
+      command = arg
 
       begin
         # Make sure the logs inherit in the right order
@@ -60,6 +67,7 @@ module PluginJob
 
         if @plugins.has_command?(command)
           cmd = String.new(command)
+          command=nil
           @host.job = Request.new(cmd, self, connection)
           connected_log(connection).debug("Command #{cmd}")
 
@@ -73,10 +81,18 @@ module PluginJob
             end
           }
           @job_wait.join
+
+          if command.nil?
+            @host.cleanup_job
+          else
+            # run the next job in the pipeline
+            run_job(command, arg)
+          end
         else
           connected_log(connection).
             warn I18n.translate('plugin_job.host.unknown_command', :command => arg)
-          @command = nil
+          command = nil
+          @host.cleanup_job
         end
       rescue => detail
         connected_log(connection)
@@ -84,9 +100,8 @@ module PluginJob
         connected_log(connection)
           .debug I18n.translate('plugin_job.host.backtrace', 
                                 :trace =>  detail.backtrace.join("\r\n"))
-        @command = nil
-      ensure
-        @host.clear_job
+        command = nil
+        @host.cleanup_job
       end
     end # run_job
 
