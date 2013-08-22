@@ -32,7 +32,7 @@ module PluginJob
         }
 
         @window.connect(SIGNAL :close_sig){
-          if @request.can_kill?
+          if @request && @request.can_kill?
             self.kill
             @window_closed = true
           end
@@ -63,7 +63,7 @@ module PluginJob
       end
 
       # add job widget to GUI if necessary
-      if @request.job.respond_to?(:widget)
+      if @request && @request.job && @request.job.respond_to?(:widget)
         @window.attach_widget(@request.job.widget)
       end
 

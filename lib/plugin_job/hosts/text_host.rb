@@ -21,7 +21,7 @@ module PluginJob
       }
 
       self.connect(SIGNAL :kill){
-        if @request.can_kill?
+        if @request && @request.can_kill?
           @request.kill
           # end any running steps
           @steps.each do |key, val|
@@ -48,7 +48,7 @@ module PluginJob
     end
 
     def valid_job?
-      @request.passed_validation?
+      @request.passed_validation? if @request
     end
     
     def process_request(arg)
@@ -96,7 +96,7 @@ module PluginJob
     end
 
     def cleanup_job
-      if @request.can_cleanup?
+      if @request && @request.can_cleanup?
         @request.cleanup
         # TODO: make sure all log messages are sent before clearing
         # the job objects
