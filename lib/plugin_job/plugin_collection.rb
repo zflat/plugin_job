@@ -16,7 +16,7 @@ module PluginJob
     end
 
     def command_list
-      map.values.flatten.map{ |c| c.to_s } + [update_cmd]
+      map.values.flatten.map{ |c| c.to_s } + [update_cmd, '']
     end
 
     def categories
@@ -31,19 +31,20 @@ module PluginJob
       end
     end
 
-    def has_command?(command)
+    def recognize_command?(command)
       command_list.include?(command.to_s)
     end
 
-    private
 
     def update_cmd
       "UpdatePlugins"
     end
 
+    private
+
     def add_cmd(cmd_str)
       @scope.instance_eval do
-        const_set(cmd_str, Updater::UpdateJob)
+        const_set(cmd_str, Updater::UpdateJob) unless defined?(cmd_str)
       end
     end
     

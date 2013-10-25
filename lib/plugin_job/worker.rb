@@ -6,7 +6,7 @@ module PluginJob
     
     def initialize(host)
       @host = host
-      init_log(host.log, "Worker")
+      init_log(host, "Worker")
     end
     
     def setup

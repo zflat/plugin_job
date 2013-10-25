@@ -4,7 +4,7 @@ require "plugin_job/hosts/text_host"
 module PluginJob
   describe Dispatcher do
     let(:log){Logger.new 'disp_spec'}
-    let(:plugins_collection){ Collection.new({}) }
+    let(:plugins_collection){ PluginCollection.new({}, Object) }
     
     let(:controller){ HostController.new(TextHost, plugins_collection, log)}
     let(:server_config){ Hash.new }

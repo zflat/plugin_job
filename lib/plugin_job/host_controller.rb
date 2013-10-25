@@ -65,7 +65,7 @@ module PluginJob
         # Make sure the logs inherit in the right order
         # Controller > Request > Host > Worker
 
-        if @plugins && @plugins.has_command?(command)
+        if @plugins && @plugins.recognize_command?(command)
           cmd = String.new(command)
           command=nil
           @host.job = Request.new(cmd, self, connection)
