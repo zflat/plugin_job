@@ -9,6 +9,29 @@ include Log4r
 # in ./support/ and its subdirectories.
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 
+module PluginJob
+  class TelnetClient
+    def initialize
+      args = {"Host" => "localhost",
+        "Timeout" => 10,
+        "Telnetmode" => false,
+        "Port" => 3333}
+      @connection = Net::Telnet::new(args)
+    end
+
+    def request(command)
+      p_matcher = Regexp.new("#{I18n.translate('plugin_job.host.completed')}|#{I18n.translate('plugin_job.host.telnet_prompt')}")
+      cmd({"String" => command, "Match" => p_matcher}) do |c|
+        # puts c
+      end
+    end
+
+    def cmd(args, &block)
+      @connection.cmd(args){ |c| yield(c)}
+    end
+  end # class TelnetClient
+end # module PluginJob
+
 RSpec.configure do |config|
 
   # Testing CLI

@@ -7,27 +7,6 @@ require "net/telnet"
 
 module PluginJob
 
-  class TelnetClient
-    def initialize
-      args = {"Host" => "localhost",
-        "Timeout" => 10,
-        "Telnetmode" => false,
-        "Port" => 3333}
-      @connection = Net::Telnet::new(args)
-    end
-
-    def request(command)
-      p_matcher = Regexp.new("#{I18n.translate('plugin_job.host.completed')}|#{I18n.translate('plugin_job.host.telnet_prompt')}")
-      cmd({"String" => command, "Match" => p_matcher}) do |c|
-        # puts c
-      end
-    end
-
-    def cmd(args, &block)
-      @connection.cmd(args){ |c| yield(c)}
-    end
-  end # TelnetClient
-
   describe "client making calls to the dispatcher" do
     let(:dispatcher){ChildProcess.
       build("ruby", File.join(File.dirname(__FILE__), '..','script','plugin_proc.rb'), 'stdout')}
@@ -62,12 +41,12 @@ module PluginJob
   end #   describe "client making calls to the dispatcher" do
 
   describe "second client making calls to the dispatcher" do
-      let(:dispatcher){ChildProcess.
+    let(:dispatcher){ChildProcess.
       build("ruby", File.join(File.dirname(__FILE__), '..','script','plugin_proc.rb'), 'stdout')}
     let(:temp_out){Tempfile.new("client_host_spec_1")}
     let(:client){TelnetClient.new}
     let(:second_client){TelnetClient.new}
-
+    
     let(:command){"Sleepy"}
     before :each do
       # capture output to a temp file
@@ -101,4 +80,4 @@ module PluginJob
     end
   end # describe "second client making calls to the dispatcher" do
 
-end
+end # module PluginJob

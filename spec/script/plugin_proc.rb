@@ -40,6 +40,13 @@ module MyJobs
     end
   end
 
+  class DelayedPrint < Print
+    def run
+      sleep(0.1)
+      super
+    end
+  end
+
   class BadPrint < Print
     def run
       super
@@ -76,6 +83,7 @@ plugins = PluginJob::PluginCollection.new({'MainCategory' =>
                                       ['Sleepy', 
                                        'Hello', 
                                        'Print', 
+                                       'DelayedPrint', 
                                        'ErrorPrint', 
                                        'BadPrint','']
                                     }, MyJobs)
