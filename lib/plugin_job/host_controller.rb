@@ -105,6 +105,18 @@ module PluginJob
       end
     end # run_job
 
+    def notify_block(command, connection)
+      begin
+        @host.block(command, connection) if @host
+      rescue => detail
+        connected_log(connection)
+          .error I18n.translate('plugin_job.host.error', :message => detail)
+        connected_log(connection)
+          .debug I18n.translate('plugin_job.host.backtrace', 
+                                :trace =>  detail.backtrace.join("\r\n")) 
+      end # begin/rescue
+    end # notify_block
+
     private
     def connected_log(connection)
       if @host && @host.log

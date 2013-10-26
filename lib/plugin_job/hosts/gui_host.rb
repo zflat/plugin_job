@@ -57,14 +57,16 @@ module PluginJob
     end # process_request
 
     def after_setup
-      # hide window if necessary
-      if @request.job.meta[:silent]
-        @window.showMinimized
-      end
-
-      # add job widget to GUI if necessary
-      if @request && @request.job && @request.job.respond_to?(:widget)
-        @window.attach_widget(@request.job.widget)
+      if @request && @request.job
+        # hide window if necessary
+        if @request.job.meta[:silent]
+          @window.showMinimized
+        end
+        
+        # add job widget to GUI if necessary
+        if @request.job.respond_to?(:widget)
+          @window.attach_widget(@request.job.widget)
+        end
       end
 
       super
@@ -114,7 +116,7 @@ module PluginJob
       @window.notify_errors
     end
 
-    def block(command)
+    def block(command, connection=nil)
       if @window_close_wait
         log.info I18n.translate('plugin_job.host.window_close_wait')
       end

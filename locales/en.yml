@@ -10,6 +10,7 @@ en:
     host:
       :command: "Command '%{command}'"
       :completed: "Completed"
+      :telnet_prompt: "#> "
       :unknown_command: "Command '%{command}' not recognized"
       :error: "An error occurred: %{message}"
       :backtrace: "Exception backtrace\r\n%{trace}"

@@ -92,15 +92,21 @@ class EchoHost < PluginJob::GuiHost
     # Given connection takes precedence over defaulted one
     c = connection || @connection
     if c
-      r = c.send_data "#> "
+      r = c.send_data I18n.translate('plugin_job.host.telnet_prompt')
     end
   end
 
-  def block(command)
+  def block(command, connection=nil)
     super
     if log
       log.warn I18n.translate('plugin_job.host.block', :command => command)
     end
+    if connection
+      connection.
+        send_data I18n.translate('plugin_job.host.block', 
+                                 :command => command)+"\r\n"
+    end
+    send_prompt(connection)
   end
 end
 
@@ -126,6 +132,8 @@ end
 # Run the application
 begin
   server.exec_app
-rescue 
-  puts "Server not running in this process"
+rescue => detail
+  puts "Plugin host exception."
+  puts detail
+  puts detail.backtrace.join("\r\n") 
 end
