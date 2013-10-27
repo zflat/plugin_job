@@ -27,7 +27,11 @@ module PluginJob
     end
 
     def cmd(args, &block)
-      @connection.cmd(args){ |c| yield(c)}
+      begin
+        @connection.cmd(args){ |c| yield(c)}
+      rescue => detail
+        yield detail
+      end
     end
   end # class TelnetClient
 end # module PluginJob

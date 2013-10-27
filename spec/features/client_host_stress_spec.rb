@@ -12,7 +12,8 @@ module PluginJob
       build("ruby", File.join(File.dirname(__FILE__), '..','script','plugin_proc.rb'), 'stdout')}
     let(:temp_out){Tempfile.new("client_host_spec_1")}
 
-    let(:command){"DelayedPrint"}
+    # let(:command){"DelayedPrint"}
+    let(:command){"HelloBye"}
     before :each do
       # capture output to a temp file
       dispatcher.io.stdout = temp_out
@@ -25,7 +26,7 @@ module PluginJob
       
       n_clients = 5
       arr_client = (1..n_clients).map{[]}
-      n_requests = 5
+      n_requests = 10
 
       (1..n_requests).to_a.each do |t|      
         (0..n_clients-1).to_a.each do |i|

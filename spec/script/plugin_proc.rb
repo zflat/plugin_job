@@ -62,15 +62,52 @@ module MyJobs
     end
   end
 
+  class HelloBye < PluginJob::Worker
+    def meta
+      {:silent => true}.merge(super)
+    end
+
+    def run
+      max_wait = 1
+      hello_delay = max_wait*rand
+      bye_delay = max_wait*rand
+
+      log.info (hello_delay < bye_delay) ? "Hello" : "Bye"
+
+      hello = Thread.new do
+        sleep(hello_delay)
+      end
+      bye = Thread.new do
+        sleep(bye_delay)
+        log.info "Canceled"
+        top_widget.close
+      end
+      hello.join
+      Thread.kill(bye)
+      log.info("Hi")
+    end
+
+    def top_widget
+      p = widget
+      while(p_next = p.parent); p = p_next end
+    end
+
+    def widget
+      if @widget.nil?
+        @widget = Qt::Label.new("Hello form :)")
+      end
+      @widget
+    end
+  end
+
   class Hello < PluginJob::Worker
     class HelloWidget < Qt::Widget
-      
     end
 
     def run
       log.info "Hello, World!"
     end
-
+    
     def widget
       if @widget.nil?
         @widget = Qt::Label.new("Hello form :)")
@@ -82,6 +119,7 @@ end
 plugins = PluginJob::PluginCollection.new({'MainCategory' =>
                                       ['Sleepy', 
                                        'Hello', 
+                                       'HelloBye', 
                                        'Print', 
                                        'DelayedPrint', 
                                        'ErrorPrint', 

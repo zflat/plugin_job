@@ -61,10 +61,12 @@ module PluginJob
     end
 
     def after_setup
-      log.info @request.computer_context_info
+      if @request
+        log.info @request.computer_context_info
 
-      # Execute the Run step asynchronisly
-      @steps[:run] = Thread.new {@request.run}
+        # Execute the Run step asynchronisly
+        @steps[:run] = Thread.new {@request.run}
+      end
     end
 
     def after_run

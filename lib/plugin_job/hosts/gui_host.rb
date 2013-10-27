@@ -27,7 +27,7 @@ module PluginJob
         log.add(@warn_watch)
         @warn_watch.emitter.connect(SIGNAL :flag){
           unless @err_watch.flag
-            @window.notify_warnings
+            @window.notify_warnings if @window
           end
         }
 
@@ -73,19 +73,19 @@ module PluginJob
     end
 
     def after_run
-      end_silent = @request.job.meta[:silent] && !@err_watch.flag
+      end_silent = @request && @request.job.meta[:silent] && !@err_watch.flag
 
       if @err_watch.flag
         notify_errors
       elsif @warn_watch.flag
-        @window.notify_warnings
+        @window.notify_warnings if @window
       else
-        @window.notify_success
+        @window.notify_success if @window
       end
       
       if end_silent
         # close the window
-        @window.close
+        @window.close if @window
         super
       else
         # Block in the background until window is closed
@@ -113,7 +113,7 @@ module PluginJob
 
     def notify_errors
       show_window
-      @window.notify_errors
+      @window.notify_errors if @window
     end
 
     def block(command, connection=nil)
