@@ -4,8 +4,15 @@ module PluginJob
 
   module LogBuilder
     
-    def self.included(base)
-      base.send(:attr_reader, :log)
+    #def self.included(base)
+    #  base.send(:attr_reader, :log)
+    #end
+
+    def log
+      if @log.nil?
+        @log = Logger.new('')
+      end
+      @log
     end
 
     private
