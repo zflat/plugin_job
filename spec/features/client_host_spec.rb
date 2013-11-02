@@ -73,7 +73,9 @@ module PluginJob
       expect(output =~ Regexp.new(command)).to_not be_nil
       
       str_invalid = I18n.translate('plugin_job.host.invalid')
+      str_err_msg = "Failure by design"
       expect(output =~ Regexp.new(str_invalid)).to_not be_nil
+      expect(output =~ Regexp.new(str_err_msg)).to_not be_nil
       expect(output =~ Regexp.new("Exception backtrace")).to be_nil
     end
   end # describe "Invalid preconditions"

@@ -2,10 +2,11 @@ module PluginJob
   class Worker
     include LogBuilder
     
-    attr_reader :host
+    attr_reader :host, :validation_errors
     
     def initialize(host)
       @host = host
+      @validation_errors = []
       init_log(host, "Worker")
     end
     
@@ -13,7 +14,7 @@ module PluginJob
     end
     
     def valid?
-      true
+      @validation_errors.empty?
     end
 
     def run

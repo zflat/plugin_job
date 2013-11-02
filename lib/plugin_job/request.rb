@@ -110,8 +110,13 @@ module PluginJob
           end
         end # begin, rescue
       else
-          connected_log.warn I18n.translate('plugin_job.host.invalid')
-          @controller.host.run_complete
+        connected_log.warn I18n.translate('plugin_job.host.invalid')
+        if !@job.validation_errors.empty?
+          @job.validation_errors.each do |msg|
+            connected_log.warn msg
+          end
+        end
+        @controller.host.run_complete
       end # job.valid?
       self.complete_run
     end # run

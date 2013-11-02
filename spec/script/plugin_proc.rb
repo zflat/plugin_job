@@ -64,7 +64,8 @@ module MyJobs
   end
   class NoPrint < Print
     def valid?
-      false
+      @validation_errors << "Failure by design"
+      super
     end
   end
   class HelloBye < PluginJob::Worker
