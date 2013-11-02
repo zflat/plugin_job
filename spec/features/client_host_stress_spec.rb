@@ -26,7 +26,7 @@ module PluginJob
       
       n_clients = 5
       arr_client = (1..n_clients).map{[]}
-      n_requests = 10
+      n_requests =50
 
       (1..n_requests).to_a.each do |t|      
         (0..n_clients-1).to_a.each do |i|
@@ -44,7 +44,7 @@ module PluginJob
       # read output from the temp file
       temp_out.rewind
       output = temp_out.read
-      puts output
+      # puts output
       expect(output).to_not be_nil
       expect(output =~ Regexp.new(command)).to_not be_nil
       expect(output =~ Regexp.new("Exception backtrace")).to be_nil
