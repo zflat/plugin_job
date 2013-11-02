@@ -62,6 +62,11 @@ module MyJobs
       1/0
     end
   end
+  class NoPrint < Print
+    def valid?
+      false
+    end
+  end
   class HelloBye < PluginJob::Worker
     def meta
       {:silent => true}.merge(super)
@@ -119,7 +124,8 @@ plugins = PluginJob::PluginCollection.new({'MainCategory' =>
                                        'DelayedPrint', 
                                        'ErrorPrint', 
                                        'BadPrint',
-                                       'BadSleep'
+                                       'BadSleep',
+                                       'NoPrint'
                                       ]
                                     }, MyJobs)
 
