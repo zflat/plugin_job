@@ -8,7 +8,9 @@ module PluginJob
 
   class SelectLauncher < Qt::MainWindow
 
-    signals :close_sig, "command_selected(QString)", :notify_errors, :notify_warnings, :notify_success
+    signals :close_sig, "command_selected(QString)",
+    :indicate_errors, :indicate_warnings,
+    :notify_errors, :notify_warnings, :notify_success
 
     attr_reader :select_form
     
@@ -121,6 +123,14 @@ module PluginJob
       @central.setLayout(@central_layout)
       self.setCentralWidget(@central)
 
+      self.connect(SIGNAL :indicate_errors) do
+        show_errors(:indicate_only => true)
+      end
+
+      self.connect(SIGNAL :indicate_warnings) do
+        show_warnings(:indicate_only => true)
+      end
+
       self.connect(SIGNAL :notify_errors) do
         show_errors
       end
@@ -168,12 +178,18 @@ module PluginJob
       super
     end # closeEvent
 
-    def show_errors
-      @statusbar.setStyleSheet("QStatusBar {background: red}")
+    def show_errors(opts={})
+      @select_form.indicate_error
+      if !opts[:indicate_only]
+        @statusbar.setStyleSheet("QStatusBar {background: red}")
+      end
     end
 
-    def show_warnings
-      @statusbar.setStyleSheet("QStatusBar {background: yellow}")
+    def show_warnings(opts={})
+      @select_form.indicate_warning
+      if !opts[:indicate_only]
+        @statusbar.setStyleSheet("QStatusBar {background: yellow}")
+      end
     end
 
     def show_success

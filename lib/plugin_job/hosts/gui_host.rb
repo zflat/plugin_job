@@ -19,7 +19,7 @@ module PluginJob
         @err_watch.only_at ERROR, FATAL
         log.add(@err_watch)
         @err_watch.emitter.connect(SIGNAL :flag){
-          notify_errors
+          notify_errors(:indicate_only => true)
         }          
 
         @warn_watch = FlagOutputter.new("errors warnings fatal")
@@ -27,7 +27,7 @@ module PluginJob
         log.add(@warn_watch)
         @warn_watch.emitter.connect(SIGNAL :flag){
           unless @err_watch.flag
-            @window.notify_warnings if @window
+            @window.indicate_warnings if @window
           end
         }
 
@@ -111,9 +111,15 @@ module PluginJob
       end
     end
 
-    def notify_errors
+    def notify_errors(opts={})
       show_window
-      @window.notify_errors if @window
+      if @window
+        if opts[:indicate_only]
+          @window.indicate_errors
+        else
+          @window.notify_errors
+        end
+      end
     end
 
     def block(command, connection=nil)

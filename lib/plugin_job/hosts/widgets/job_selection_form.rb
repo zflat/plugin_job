@@ -49,6 +49,14 @@ module PluginJob
       end
     end
 
+    def indicate_warning
+      @box.setStyleSheet("QComboBox {border: 2px solid yellow}")
+    end
+
+    def indicate_error
+      @box.setStyleSheet("QComboBox {border: 2px solid red}")
+    end
+
   end #   class JobSelectionForm < Qt::Widget
 
 end # module PluginJob
