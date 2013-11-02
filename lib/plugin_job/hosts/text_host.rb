@@ -6,7 +6,10 @@ module PluginJob
     
     include LogBuilder
 
-    signals :complete, :kill, "launch(QString)", :setup_complete, :run_complete
+    signals( 
+            :complete, :kill, "launch(QString)", 
+            :setup_complete, :run_complete
+            )
 
     attr_reader :plugins, :pipeline_cmd
     
@@ -27,7 +30,7 @@ module PluginJob
           @steps.each do |key, val|
             Thread.kill(val)
           end
-          end_job
+          emit complete
         end
       }
 
@@ -71,18 +74,16 @@ module PluginJob
 
     def after_run
       @pipeline_cmd = nil
-      @pipeline_cmd = String.new(@request.pipeline_cmd) if @request.pipeline_cmd
-      end_job
+      if @request.pipeline_cmd && !@request.killed
+        @pipeline_cmd = String.new(@request.pipeline_cmd) 
+      end
+      emit complete
     end
 
     def job=(request)
       @request = request
       @connection = request.connection
       init_log(request.log, "host")
-    end
-
-    def end_job
-      emit complete
     end
 
     def block(command, connection=nil)

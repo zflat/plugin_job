@@ -18,7 +18,7 @@ module PluginJob
 
       @host_scope = host_scope
       @host = host_scope.new
-      @host.connect(SIGNAL :complete){ job_finished }
+      @host.connect(SIGNAL :complete){ job_finish_isr }
     end
 
     def job_finished?
@@ -29,7 +29,9 @@ module PluginJob
       return finished
     end
 
-    def job_finished
+    # Interrupt service routine to handle
+    # the job finished signal
+    def job_finish_isr
       @job_status_lock.synchronize {
         @command = nil
         @command = @host.pipeline_cmd
@@ -54,6 +56,7 @@ module PluginJob
     def job_started
       @job_status_lock.synchronize {
         @complete = false
+        @canceled = false
         @command = nil
       }
     end
@@ -74,25 +77,23 @@ module PluginJob
           job_started
           @host.launch(cmd)
 
-          # Block until job is finished
+          # Block until job is finished or canceled
           @job_wait = Thread.new {
-            while ! job_finished?
+            while ! (job_finished?)
               sleep 0.05
             end
           }
           @job_wait.join
 
-          if command.nil?
-            @host.cleanup_job
-          else
-            # run the next job in the pipeline
+          # Next job in the pipeline
+          command = @host.pipeline_cmd 
+          if !command.nil?
             run_job(command, arg)
           end
-        else
+        else # not recognized?
           connected_log(connection).
             warn I18n.translate('plugin_job.host.unknown_command', :command => arg)
           command = nil
-          @host.cleanup_job
         end
       rescue => detail
         connected_log(connection)
@@ -101,9 +102,13 @@ module PluginJob
           .debug I18n.translate('plugin_job.host.backtrace', 
                                 :trace =>  detail.backtrace.join("\r\n"))
         command = nil
-        @host.cleanup_job
       end
     end # run_job
+
+    def cleanup_job(connection)
+      @host.send_prompt(connection)
+      @host.cleanup_job
+    end
 
     def notify_block(command, connection)
       begin
@@ -130,7 +135,7 @@ module PluginJob
       end
       l ||= log
       return l
-    end
+    end # connected_log
 
   end # class HostController
 end # module PluginJob

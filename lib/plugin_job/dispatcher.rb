@@ -42,7 +42,7 @@ module PluginJob
     def queue_request
       proc {
         if block.try_lock
-          while(command)
+          if command
             begin
               if command.downcase == "exit"
                 EM::stop
@@ -50,6 +50,7 @@ module PluginJob
                 dispatch_job command
               end
               sleep 0.05
+              # next job in the pipeline
               @command = @host_controller.command && String.new(@host_controller.command)
             rescue => detail
               @host_controller.log
@@ -59,11 +60,14 @@ module PluginJob
                                       :trace =>  detail.backtrace.join("\r\n")) 
               break
             end # begin/rescue
-          end # while command.present?
+          end # if command.present?
           
-          block.unlock
+          @host_controller.cleanup_job(self)
+
+          # block until cleanup is done
           sleep 0.05
-          @host_controller.host.send_prompt(self)
+          block.unlock
+
         else # block.try_lock
           notify_block
         end
