@@ -29,40 +29,32 @@ module MyJobs
       log.error("Nothing usefull accomplished.")
     end
   end
-  
   class Print < PluginJob::Worker
     def run
       log.info "Printing output text"
     end
-
     def meta
       {:silent => true}.merge(super)
     end
   end
-
   class DelayedPrint < Print
     def run
       sleep(0.1)
       super
     end
   end
-
   class BadPrint < Print
     def run
       super
       log.error "Bad...print"
     end
   end
-
-
   class BadSleep < Sleepy
     def run
       log.error "Bad...sleep"
       super
     end
   end
-
-
   class ErrorPrint < Print
     def run
       super
@@ -70,12 +62,10 @@ module MyJobs
       1/0
     end
   end
-
   class HelloBye < PluginJob::Worker
     def meta
       {:silent => true}.merge(super)
     end
-
     def run
       max_wait = 1
       hello_delay = max_wait*rand
@@ -95,12 +85,10 @@ module MyJobs
       Thread.kill(bye)
       log.info("Hi")
     end
-
     def top_widget
       p = widget
       while(p_next = p.parent); p = p_next end
     end
-
     def widget
       if @widget.nil?
         @widget = Qt::Label.new("Hello form :)")
@@ -108,15 +96,12 @@ module MyJobs
       @widget
     end
   end
-
   class Hello < PluginJob::Worker
     class HelloWidget < Qt::Widget
     end
-
     def run
       log.info "Hello, World!"
     end
-    
     def widget
       if @widget.nil?
         @widget = Qt::Label.new("Hello form :)")
@@ -124,7 +109,8 @@ module MyJobs
       @widget
     end
   end
-end
+end # module MyJobs
+
 plugins = PluginJob::PluginCollection.new({'MainCategory' =>
                                       ['Sleepy', 
                                        'Hello', 
