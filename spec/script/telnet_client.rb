@@ -4,6 +4,9 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..','..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 
 require "net/telnet"
+
+# consider using https://github.com/paddor/em-simple_telnet for the telnet client
+
 localhost = nil
 while !localhost
   begin
@@ -32,15 +35,21 @@ while cmd
   input = STDIN.gets
   if input
     cmd = input.chomp
+
     begin
       localhost.cmd({"String" => cmd,
+                      "FailEOF" => true,
                       "Match" => Regexp.new("#> ")}) do |c|
         print "#{c}"
       end
-    rescue
+    rescue => detail
+      puts detail
+      puts detail.backtrace.join("\r\n")
       exit 1
     end
   end
+  sleep 0.01
 end
 
-
+watcher.kill
+localhost.kill
