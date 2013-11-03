@@ -11,8 +11,6 @@ module PluginJob
     def initialize(map, scope)
       @map = map
       @scope = scope
-
-      add_cmd(update_cmd)
     end
 
     def command_list
@@ -26,6 +24,8 @@ module PluginJob
     def [](command)
       if command == ""
         PluginJob::Worker
+      elsif command == update_cmd
+        Updater::UpdateJob
       else
         @scope.const_get(command.to_sym)
       end
@@ -35,18 +35,9 @@ module PluginJob
       command_list.include?(command.to_s)
     end
 
-
     def update_cmd
       "UpdatePlugins"
     end
 
-    private
-
-    def add_cmd(cmd_str)
-      @scope.instance_eval do
-        const_set(cmd_str, Updater::UpdateJob) unless defined?(cmd_str)
-      end
-    end
-    
   end # class
 end # module

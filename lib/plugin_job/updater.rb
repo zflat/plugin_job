@@ -38,7 +38,10 @@ module PluginJob
       end
 
       def valid?
-        @is_outdated
+        if !@is_outdated
+          @validation_errors << I18n.translate('plugin_job.update.not_needed')
+        end
+        super
       end
 
       def meta
